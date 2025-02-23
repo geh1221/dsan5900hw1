@@ -1,0 +1,211 @@
+---
+title: "Waitlist & Decline Trends"
+output: html_document
+date: "2025-02-22"
+format:
+  code-fold: true
+  warning: false
+  embed-resources: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(corrplot)
+library(gt)
+```
+
+## Overview of Waitlist vs Decline
+
+```{r}
+data <- read_csv("../data/cleaned_data/data_cleaned.csv")
+wd <- data[data$Decision != "Admit", ]
+num_vars <- subset(wd, select = -c(State, ...1))
+num_vars <- subset(wd, select = -c(State, ...1))
+num_vars %>% group_by(Decision) %>%
+  summarise("GPA" = mean(GPA), 
+            "Work Experience" = mean(WorkExp), 
+            "Test Score" = mean(TestScore), 
+            "Writing Score" = mean(WritingScore), 
+            "Volunteer Level" = mean(VolunteerLevel)) %>% 
+  gt() %>%
+  tab_style(
+    style = cell_fill(color = "#FFF3CD"),  
+    locations = cells_body(
+      columns = GPA,
+      rows = GPA == max(GPA)
+    )
+  ) %>%
+  tab_style(
+    style = cell_fill(color = "#FFF3CD"),
+    locations = cells_body(
+      columns = `Test Score`,
+      rows = `Test Score` == max(`Test Score`)
+    )
+  ) %>%
+  tab_style(
+    style = cell_fill(color = "#FFF3CD"),
+    locations = cells_body(
+      columns = `Writing Score`,
+      rows = `Writing Score` == max(`Writing Score`)
+    )
+  )
+```
+
+```{r}
+shapiro.test(wd$GPA[wd$Decision == "Waitlist"])
+shapiro.test(wd$GPA[wd$Decision == "Decline"])
+var.test(GPA ~ Decision, data = wd)
+
+t.test(GPA ~ Decision, data = wd, var.equal = FALSE) 
+t.test(WorkExp ~ Decision, data = wd, var.equal = FALSE)
+t.test(TestScore ~ Decision, data = wd, var.equal = FALSE)
+t.test(WritingScore ~ Decision, data = wd, var.equal = FALSE)
+t.test(VolunteerLevel ~ Decision, data = wd, var.equal = FALSE)
+```
+
+From this table, we can see that there are differences between the wait list and decline individuals that stick out. The wait list GPA is higher by around 0.23 points, as well as a big increase in test score, and writing score. There doesn't appear to be a big difference between Work Experience and Volunteer Level. 
+
+## Exploring Each Variable
+
+You can also embed plots, for example:
+
+```{r}
+min(wd_bands$GPA)
+wd_bands <- data.frame(wd)
+wd_bands <- subset(wd_bands, select = -c(...1))
+wd_bands <- wd_bands %>% 
+  mutate(GPA_Bands = case_when(
+    GPA < 2.40 ~ "< 2.40", 
+    GPA >= 2.40 & GPA <= 2.49 ~ "2.40-2.49", 
+    GPA >= 2.50 & GPA <= 2.59 ~ "2.50-2.59", 
+    GPA >= 2.60 & GPA <= 2.69 ~ "2.60-2.69", 
+    GPA >= 2.70 & GPA <= 2.79 ~ "2.70-2.79", 
+    GPA >= 2.80 & GPA <= 2.89 ~ "2.80-2.89", 
+    GPA >= 2.90 & GPA <= 2.99 ~ "2.90-2.99", 
+    GPA >= 3.00 & GPA <= 3.09 ~ "3.00-3.09", 
+    GPA >= 3.10 & GPA <= 3.19 ~ "3.10-3.19", 
+    GPA >= 3.20 & GPA <= 3.29 ~ "3.20-3.29", 
+    GPA >= 3.30 & GPA <= 3.39 ~ "3.30-3.39", 
+    GPA >= 3.40 & GPA <= 3.49 ~ "3.40-3.49", 
+    GPA >= 3.50 & GPA <= 3.59 ~ "3.50-3.59", 
+    GPA >= 3.60 & GPA <= 3.69 ~ "3.60-3.69", 
+    GPA >= 3.70 & GPA <= 3.79 ~ "3.70-3.79", 
+    GPA >= 3.80 & GPA <= 3.89 ~ "3.80-3.89", 
+    GPA >= 3.90 & GPA <= 3.99 ~ "3.90-3.99", 
+    GPA == 4.00 ~ "4.00"
+  ))
+
+wd_bands_count <- wd_bands %>%
+  count(GPA_Bands, Decision) %>%
+  complete(GPA_Bands, Decision, fill = list(n = 0))
+
+ggplot(wd_bands_count, aes(fill = Decision, y = n, x = GPA_Bands)) + 
+  geom_bar(position = "dodge", stat = "identity") +
+  scale_fill_manual(values = c("Decline" = "firebrick", "Waitlist" = "darkgoldenrod1")) +
+  theme_minimal() +
+  labs(x = "GPA Bands", y = "Count", fill = "Decision") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  ggtitle("Comparison of Waitlist vs Decline GPA")
+```
+
+```{r}
+min(wd_bands$WritingScore)
+wd_bands <- data.frame(wd)
+wd_bands <- subset(wd_bands, select = -c(...1))
+wd_bands <- wd_bands %>% 
+  mutate(Test_Score_Bands = case_when(
+    TestScore < 760 ~ "< 760", 
+    TestScore >= 760 & TestScore <= 769 ~ "760-769", 
+    TestScore >= 770 & TestScore <= 779 ~ "770-779", 
+    TestScore >= 780 & TestScore <= 789 ~ "780-789", 
+    TestScore >= 790 & TestScore <= 799 ~ "790-799", 
+    TestScore >= 800 & TestScore <= 809 ~ "800-809", 
+    TestScore >= 810 & TestScore <= 819 ~ "810-819", 
+    TestScore >= 820 & TestScore <= 829 ~ "820-829", 
+    TestScore >= 830 & TestScore <= 839 ~ "830-839", 
+    TestScore >= 840 & TestScore <= 849 ~ "840-849", 
+    TestScore >= 850 & TestScore <= 859 ~ "850-859", 
+    TestScore >= 860 & TestScore <= 869 ~ "860-869", 
+    TestScore >= 870 & TestScore <= 879 ~ "870-879", 
+    TestScore >= 880 & TestScore <= 889 ~ "880-889", 
+    TestScore >= 890 & TestScore <= 899 ~ "890-899", 
+    TestScore > 900 ~ "> 900"
+  ))
+
+
+wd_bands_count <- wd_bands %>%
+  count(Test_Score_Bands, Decision) %>%
+  complete(Test_Score_Bands, Decision, fill = list(n = 0))
+
+ggplot(wd_bands_count, aes(fill = Decision, y = n, x = Test_Score_Bands)) + 
+  geom_bar(position = "dodge", stat = "identity") +
+  scale_fill_manual(values = c("Decline" = "firebrick", "Waitlist" = "darkgoldenrod1")) +
+  theme_minimal() +
+  labs(x = "GPA Bands", y = "Count", fill = "Decision") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  ggtitle("Comparison of Waitlist vs Decline Test Scores")
+```
+
+```{r}
+min(wd_bands$WritingScore)
+wd_bands <- data.frame(wd)
+wd_bands <- subset(wd_bands, select = -c(...1))
+wd_bands <- wd_bands %>% 
+  mutate(Writing_Score_Bands = case_when(
+    WritingScore < 60 ~ "< 60", 
+    WritingScore >= 60 & WritingScore <= 64 ~ "60-64", 
+    WritingScore >= 65 & WritingScore <= 69 ~ "65-69", 
+    WritingScore >= 70 & WritingScore <= 74 ~ "70-74", 
+    WritingScore >= 75 & WritingScore <= 79 ~ "75-79", 
+    WritingScore >= 80 & WritingScore <= 84 ~ "80-84", 
+    WritingScore >= 85 & WritingScore <= 89 ~ "85-89", 
+    WritingScore > 90 ~ "> 90"
+  ))
+
+wd_bands_count <- wd_bands %>%
+  count(Writing_Score_Bands, Decision) %>%
+  complete(Writing_Score_Bands, Decision, fill = list(n = 0))
+
+ggplot(wd_bands_count, aes(fill = Decision, y = n, x = Writing_Score_Bands)) + 
+  geom_bar(position = "dodge", stat = "identity") +
+  scale_fill_manual(values = c("Decline" = "firebrick", "Waitlist" = "darkgoldenrod1")) +
+  theme_minimal() +
+  labs(x = "GPA Bands", y = "Count", fill = "Decision") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  ggtitle("Comparison of Waitlist vs Decline Writing Scores")
+```
+
+## Looking at Gender, State, Work Experience, and Volunteer Experience
+
+```{r}
+total_decline_waitlist <- wd_bands %>%
+  filter(Decision %in% c("Waitlist", "Decline")) %>%
+  summarise(Total = n()) %>%
+  pull(Total)
+
+gender_table <- wd_bands %>%
+  filter(Decision %in% c("Waitlist", "Decline")) %>%
+  group_by(Gender, Decision) %>%
+  summarise(Count = n(), .groups = "drop") %>%
+  mutate(Percentage = round(Count / total_decline_waitlist * 100, 2)) %>%
+  arrange(Decision, Gender)
+gender_table %>% gt()
+```
+
+```{r}
+state_table <- wd_bands %>%
+  filter(Decision %in% c("Waitlist", "Decline")) %>%
+  group_by(State, Decision) %>%
+  summarise(Count = n(), .groups = "drop") %>%
+  mutate(Percentage = round(Count / total_decline_waitlist * 100, 2)) %>%
+  arrange(Decision, desc(Percentage))
+state_table %>% gt()
+```
+
+
+## Case Study
+
+```{r}
+
+```

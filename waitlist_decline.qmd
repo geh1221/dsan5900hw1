@@ -1,0 +1,68 @@
+---
+title: "Analysing the Waitlist and Decline Groups"
+format:
+  html:
+    code-fold: true
+    embed-resources: true
+    warning: false
+    echo: false
+---
+
+```{r}
+library(tidyverse)
+library(corrplot)
+library(gt)
+```
+
+## Overview of Waitlist vs Decline Groups
+
+
+
+```{r}
+data <- read_csv("data/cleaned_data/data_cleaned.csv")
+wd <- data[data$Decision != "Admit", ]
+num_vars <- subset(wd, select = -c(State, ...1))
+num_vars <- subset(wd, select = -c(State, ...1))
+num_vars %>% group_by(Decision) %>%
+  summarise("GPA" = mean(GPA), 
+            "Work Experience" = mean(WorkExp), 
+            "Test Score" = mean(TestScore), 
+            "Writing Score" = mean(WritingScore), 
+            "Volunteer Level" = mean(VolunteerLevel)) %>% 
+  gt() %>%
+  tab_style(
+    style = cell_fill(color = "#FFF3CD"),  
+    locations = cells_body(
+      columns = GPA,
+      rows = GPA == max(GPA)
+    )
+  ) %>%
+  tab_style(
+    style = cell_fill(color = "#FFF3CD"),
+    locations = cells_body(
+      columns = `Test Score`,
+      rows = `Test Score` == max(`Test Score`)
+    )
+  ) %>%
+  tab_style(
+    style = cell_fill(color = "#FFF3CD"),
+    locations = cells_body(
+      columns = `Work Experience`,
+      rows = `Work Experience` == max(`Work Experience`)
+    ) 
+  ) %>%
+  tab_style(
+    style = cell_fill(color = "#FFF3CD"),
+    locations = cells_body(
+      columns = `Volunteer Level`,
+      rows = `Volunteer Level` == max(`Volunteer Level`)
+    )
+  ) %>% 
+    tab_style(
+    style = cell_fill(color = "#FFF3CD"),
+    locations = cells_body(
+      columns = `Writing Score`,
+      rows = `Writing Score` == max(`Writing Score`)
+    )
+  )
+```
