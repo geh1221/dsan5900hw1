@@ -241,6 +241,14 @@ max_gpa_a <- admit[admit$GPA >= 3.80 & admit$GPA <= 3.90, ][2, ]
 max_gpa_a %>% gt()
 ```
 
+```{r}
+waitlist <- data[data$Decision == "Waitlist", ]
+waitlist <- subset(waitlist, select = -c(...1))
+max_gpa_w <- waitlist[waitlist$GPA == max(waitlist$GPA), ]
+max_gpa_w %>% gt()
+```
+
+
 Based on GPA, we may be surprised that candidate 1 got declined. As we have seen, a 3.84 is well within the range for acceptance. Their test scores and writing scores were also on the higher end of the waitlist range. The question remains, why did this person get declined and not admitted, let alone waitlisted? The main difference we see between this candidate and the admitted candidates are the test and writing scores. Were these scores higher, perhaps they would have been admitted. There also was a difference in volunteer level. 
 
 
