@@ -1,0 +1,296 @@
+---
+title: "General Trends"
+execute:
+  echo: false
+format: html
+---
+
+The dataset contains information about **79 students** applying to an internship. There are eight variables in the dataset related to a student's background, various test scores, and the internship hiring decision. These six variables are the state the student is from, **gender**, **GPA**, **test score**, **writing test score**, the number of years of **work experience** they have,the level of effort they put into **volunteering**, and their admission **decision** (admitted, waitlisted, or declined). We will first investigate trends by admission decision in these variables as well as how correlated they are with the admission decision. These trends will help inform the board of the most important factors that internship hiring committes are using.
+
+## Admission Decisions
+
+The same percentage of students were admitted and declined, 35.4%. Slighly less students, 29.1%, were waitlisted. Overall, admissions decisions were split relatively equally. 
+
+```{r}
+#| warning: false
+library(ggplot2)
+library(dplyr)
+df <- read.csv("../data/cleaned_data/data_cleaned.csv")
+
+df$Decision <- factor(df$Decision, levels = c("Decline", "Waitlist", "Admit"))
+
+ggplot(df, aes(x = Decision, fill = Decision)) +
+  geom_bar(stat = "count", position = "dodge") + 
+  coord_flip() + 
+  theme_classic() + 
+  scale_fill_manual(values = c("Admit" = "yellowgreen", "Waitlist" = "darkgoldenrod1", "Decline" = "firebrick")) +
+  labs(title = "Admission Decisions are Fairly Well-Balanced",
+       x = "Decision", 
+       y = "Percentage of Students", 
+       fill = "Decision") +
+  geom_text(
+    aes(label = scales::percent(..count../sum(..count..), accuracy = 0.1)),
+    stat = "count", 
+    position = position_stack(vjust = 0.5), 
+    size = 5
+  ) + theme(
+    axis.title.y = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks = element_blank(),
+    axis.line = element_blank(),
+    legend.position = "none"
+  )
+```
+## State
+
+Applicants came from 10 states, with Florida having the most applicants, followed by Colorado and California. California had the highest percentage of admits compared to other states. No students from states with only one applicant were admitted. All four applicants from Virginia were declined. Overall, admission decisions appear to vary across states so we can assume that the state a applicant is from could affect their admission decision.
+
+```{r}
+#| warning: false
+df <- df %>%
+  mutate(Decision = factor(Decision, levels = c("Decline", "Waitlist", "Admit")))
+ggplot(df, aes(x = reorder(State, table(State)[State]), fill = Decision)) +
+  geom_bar() + coord_flip() + 
+  theme_classic() + scale_fill_manual(values = c("Admit" = "yellowgreen", "Waitlist" = "darkgoldenrod1", 
+"Decline" = "firebrick"))  +
+labs(title = "Decision Proportions Vary by State",
+       x = "State", 
+       y = "Number of Students", 
+       fill = "Decision") 
+```
+
+## Gender
+
+```{r}
+#| warning: false
+df_percent <- df %>%
+  mutate(Gender = factor(Gender, levels = c(0, 1), labels = c("Male", "Female")),
+         Decision = factor(Decision, levels = c("Decline", "Waitlist", "Admit"))) %>% 
+  group_by(Gender, Decision) %>%
+  summarise(count = n()) %>%
+  group_by(Gender) %>%
+  mutate(percentage = count / sum(count) * 100) %>%
+  ungroup()
+
+ggplot(df_percent, aes(x = reorder(Gender, -percentage), y = percentage, fill = Decision)) +
+  geom_bar(stat = "identity") + 
+  coord_flip() +
+  theme_classic() +
+  scale_fill_manual(values = c("Admit" = "yellowgreen", "Waitlist" = "darkgoldenrod1", 
+                               "Decline" = "firebrick")) +
+  labs(title = "Decision Proportions are Nearly Identical Across Genders",
+       x = "Gender", 
+       y = "Percentage of Students", 
+       fill = "Decision") +
+  geom_text(aes(label = paste0(round(percentage, 1), "%")), 
+            position = position_stack(vjust = 0.5),
+            size = 4, color = "black") 
+```
+
+## GPA
+
+```{r}
+library(tidyr)
+wd <- read.csv("data/cleaned_data/data_cleaned.csv")
+wd_bands <- data.frame(wd)
+#wd_bands <- subset(wd_bands, select = -c(...1))
+wd_bands <- wd_bands %>% 
+  mutate(GPA_Bands = case_when(
+    GPA < 2.40 ~ "< 2.40", 
+    GPA >= 2.40 & GPA <= 2.49 ~ "2.40-2.49", 
+    GPA >= 2.50 & GPA <= 2.59 ~ "2.50-2.59", 
+    GPA >= 2.60 & GPA <= 2.69 ~ "2.60-2.69", 
+    GPA >= 2.70 & GPA <= 2.79 ~ "2.70-2.79", 
+    GPA >= 2.80 & GPA <= 2.89 ~ "2.80-2.89", 
+    GPA >= 2.90 & GPA <= 2.99 ~ "2.90-2.99", 
+    GPA >= 3.00 & GPA <= 3.09 ~ "3.00-3.09", 
+    GPA >= 3.10 & GPA <= 3.19 ~ "3.10-3.19", 
+    GPA >= 3.20 & GPA <= 3.29 ~ "3.20-3.29", 
+    GPA >= 3.30 & GPA <= 3.39 ~ "3.30-3.39", 
+    GPA >= 3.40 & GPA <= 3.49 ~ "3.40-3.49", 
+    GPA >= 3.50 & GPA <= 3.59 ~ "3.50-3.59", 
+    GPA >= 3.60 & GPA <= 3.69 ~ "3.60-3.69", 
+    GPA >= 3.70 & GPA <= 3.79 ~ "3.70-3.79", 
+    GPA >= 3.80 & GPA <= 3.89 ~ "3.80-3.89", 
+    GPA >= 3.90 & GPA <= 3.99 ~ "3.90-3.99", 
+    GPA == 4.00 ~ "4.00"
+  ))
+
+wd_bands_count <- wd_bands %>%
+  count(GPA_Bands, Decision) %>%
+  complete(GPA_Bands, Decision, fill = list(n = 0))
+
+ggplot(wd_bands_count, aes(fill = Decision, y = n, x = GPA_Bands)) + 
+  geom_bar(position = "dodge", stat = "identity") +
+  scale_fill_manual(values = c("Decline" = "firebrick", "Waitlist" = "darkgoldenrod1", "Admit" = "yellowgreen")) +
+  theme_minimal() +
+  labs(x = "GPA Bands", y = "Number of Students", fill = "Decision") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  ggtitle("Comparison of GPA Across Decisions")
+```
+
+## Test Scores
+
+```{r}
+wd_bands <- wd_bands %>% 
+  mutate(Test_Score_Bands = case_when(
+    TestScore < 760 ~ "< 760", 
+    TestScore >= 760 & TestScore <= 769 ~ "760-769", 
+    TestScore >= 770 & TestScore <= 779 ~ "770-779", 
+    TestScore >= 780 & TestScore <= 789 ~ "780-789", 
+    TestScore >= 790 & TestScore <= 799 ~ "790-799", 
+    TestScore >= 800 & TestScore <= 809 ~ "800-809", 
+    TestScore >= 810 & TestScore <= 819 ~ "810-819", 
+    TestScore >= 820 & TestScore <= 829 ~ "820-829", 
+    TestScore >= 830 & TestScore <= 839 ~ "830-839", 
+    TestScore >= 840 & TestScore <= 849 ~ "840-849", 
+    TestScore >= 850 & TestScore <= 859 ~ "850-859", 
+    TestScore >= 860 & TestScore <= 869 ~ "860-869", 
+    TestScore >= 870 & TestScore <= 879 ~ "870-879", 
+    TestScore >= 880 & TestScore <= 889 ~ "880-889", 
+    TestScore >= 890 & TestScore <= 899 ~ "890-899", 
+    TestScore >= 900 ~ ">= 900"
+  ))
+
+wd_bands <- wd_bands %>% 
+  mutate(Test_Score_Bands = factor(Test_Score_Bands, levels = c(
+    "< 760", "760-769", "770-779", "780-789", "790-799", 
+    "800-809", "810-819", "820-829", "830-839", "840-849", 
+    "850-859", "860-869", "870-879", "880-889", "890-899", ">= 900"
+  )))
+
+
+wd_bands_count <- wd_bands %>%
+  count(Test_Score_Bands, Decision) %>%
+  complete(Test_Score_Bands, Decision, fill = list(n = 0))
+
+ggplot(wd_bands_count, aes(fill = Decision, y = n, x = Test_Score_Bands)) + 
+  geom_bar(position = "dodge", stat = "identity") +
+  scale_fill_manual(values = c("Decline" = "firebrick", "Waitlist" = "darkgoldenrod1", "Admit" = "yellowgreen")) +
+  theme_minimal() +
+  labs(x = "Test Score Bands", y = "Number of Students", fill = "Decision") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  ggtitle("Comparison of Test Scores Across Decisions")
+```
+
+## Writing Scores
+
+```{r}
+wd_bands <- wd_bands %>% 
+  mutate(Writing_Score_Bands = case_when(
+    WritingScore < 60 ~ "< 60", 
+    WritingScore >= 60 & WritingScore <= 64 ~ "60-64", 
+    WritingScore >= 65 & WritingScore <= 69 ~ "65-69", 
+    WritingScore >= 70 & WritingScore <= 74 ~ "70-74", 
+    WritingScore >= 75 & WritingScore <= 79 ~ "75-79", 
+    WritingScore >= 80 & WritingScore <= 84 ~ "80-84", 
+    WritingScore >= 85 & WritingScore <= 89 ~ "85-89", 
+    WritingScore >= 90 ~ ">= 90"
+  ))
+
+wd_bands <- wd_bands %>% 
+  mutate(Writing_Score_Bands = factor(Writing_Score_Bands, levels = c(
+    "< 60", "60-64", "65-69", "70-74", "75-79", 
+    "80-84", "85-89", ">= 90"
+  )))
+
+
+wd_bands_count <- wd_bands %>%
+  count(Writing_Score_Bands, Decision) %>%
+  complete(Writing_Score_Bands, Decision, fill = list(n = 0))
+
+ggplot(wd_bands_count, aes(fill = Decision, y = n, x = Writing_Score_Bands)) + 
+  geom_bar(position = "dodge", stat = "identity") +
+  scale_fill_manual(values = c("Decline" = "firebrick", "Waitlist" = "darkgoldenrod1", "Admit" = "yellowgreen")) +
+  theme_minimal() +
+  labs(x = "GPA Bands", y = "Number of Students", fill = "Decision") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  ggtitle("Comparison of Writing Scores Across Decisions")
+```
+
+## Work Experience
+
+```{r}
+wd_bands <- wd_bands %>% 
+  mutate(WorkExp_Bands = case_when(
+    WorkExp < 1 ~ "< 1", 
+    WorkExp >= 1 & WorkExp <= 1.9 ~ "1-1.9", 
+    WorkExp >= 2 & WorkExp <= 2.9 ~ "2-2.9", 
+    WorkExp >= 3 & WorkExp <= 3.9 ~ "3-3.9", 
+    WorkExp >= 4 & WorkExp <= 4.9 ~ "4-4.9", 
+    WorkExp >= 5 & WorkExp <= 5.9 ~ "5-5.9", 
+    WorkExp >= 6 & WorkExp <= 6.9 ~ "6-6.9", 
+    WorkExp >= 7 & WorkExp <= 7.9 ~ "7-7.9",
+    WorkExp >= 8 & WorkExp <= 8.9 ~ "8-8.9",
+    WorkExp >= 9 ~ ">= 9"
+  ))
+
+wd_bands <- wd_bands %>% 
+  mutate(WorkExp_Bands = factor(WorkExp_Bands, levels = c(
+    "< 1", "1-1.9", "2-2.9", "3-3.9", "4-4.9", 
+    "5-5.9", "6-6.9", "7-7.9", "8-8.9",">= 9"
+  )))
+
+
+wd_bands_count <- wd_bands %>%
+  count(WorkExp_Bands, Decision) %>%
+  complete(WorkExp_Bands, Decision, fill = list(n = 0))
+
+ggplot(wd_bands_count, aes(fill = Decision, y = n, x = WorkExp_Bands)) + 
+  geom_bar(position = "dodge", stat = "identity") +
+  scale_fill_manual(values = c("Decline" = "firebrick", "Waitlist" = "darkgoldenrod1", "Admit" = "yellowgreen")) +
+  theme_minimal() +
+  labs(x = "Work Experience Bands (in years)", y = "Number of Students", fill = "Decision") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  ggtitle("Comparison of Work Experience Across Decisions")
+```
+
+## Volunteer Experience
+```{r}
+wd_bands_count <- wd_bands %>%
+  count(VolunteerLevel, Decision) %>%
+  complete(VolunteerLevel, Decision, fill = list(n = 0))
+
+ggplot(wd_bands_count, aes(fill = Decision, y = n, x = as.factor(VolunteerLevel))) + 
+  geom_bar(position = "dodge", stat = "identity") +
+  scale_fill_manual(values = c("Decline" = "firebrick", "Waitlist" = "darkgoldenrod1", "Admit" = "yellowgreen")) +
+  theme_minimal() +
+  labs(x = "Volunteer Level", y = "Number of Students", fill = "Decision") +
+  theme(axis.text.x = element_text(hjust = 1)) + 
+  ggtitle("Comparison of Volunteer Level Across Decisions")
+```
+
+
+## Correlations
+```{r}
+#| warning: false
+library(dplyr)
+library(ggplot2)
+library(ggcorrplot)
+library(reshape2)
+
+# Map Decision to numeric values
+df_corr <- df %>%
+  mutate(Decision_Num = case_when(
+    Decision == "Admit" ~ 1,
+    Decision == "Decline" ~ -1,
+    Decision == "Waitlist" ~ 0
+  )) %>%
+  mutate(Decision_Num = as.numeric(Decision_Num)) %>% select(-X)
+
+
+df_corr$Decision_Num <- as.numeric(as.character(df_corr$Decision_Num))
+
+colnames(df_corr) <- c("Decision","State", "GPA", "Work Experience", "Test Score", "Writing Score", "Gender", "Volunteer Level", "Decision") 
+
+corr_matrix <- cor(select(df_corr, where(is.numeric)), use = "complete.obs")
+
+
+ggcorrplot(corr_matrix, 
+           method = "circle", 
+           type = "lower", 
+           lab = TRUE, 
+           colors = c("firebrick", "darkgoldenrod1", "yellowgreen")) +
+  ggtitle("Correlations Between Variables")
+
+```

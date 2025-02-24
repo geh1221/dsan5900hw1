@@ -1,0 +1,24 @@
+project:
+  type: website
+
+website:
+  title: "website"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: general_trends.qmd
+        text: Data Overview and Trends
+      - href: admit_trends.qmd
+        text: Admit Trends
+      - href: waitlist_decline.qmd
+        text: Waitlist and Decline Trends
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+
+
+
