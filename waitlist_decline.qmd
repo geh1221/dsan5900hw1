@@ -117,6 +117,8 @@ p_vals %>%
 
 ```
 
+From this test, we see that there is a statistically significant difference in means between the decline and waitlist groups in GPA, Test Score, and Writing Score. These are the variables we will explore further to see how different they are between the waitlist/decline groups.
+
 ## Exploring Significant Variables 
 
 ```{r}
@@ -157,6 +159,8 @@ ggplot(wd_bands_count, aes(fill = Decision, y = n, x = GPA_Bands)) +
   ggtitle("Comparison of Waitlist vs Decline GPA")
 ```
 
+In terms of GPA, we see that the waitlisted students' GPAs range between 3.20 and 3.59, whereas the declined students' GPAs are across the board.
+
 ```{r}
 wd_bands <- data.frame(wd)
 wd_bands <- subset(wd_bands, select = -c(...1))
@@ -193,6 +197,7 @@ ggplot(wd_bands_count, aes(fill = Decision, y = n, x = Test_Score_Bands)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
   ggtitle("Comparison of Waitlist vs Decline Test Scores")
 ```
+In this exploration of the test scores for waitlisted and declined students, we see that declined students tended to have lower test scores, with scores typically being below 800, whereas all waitlisted students had scores between 850-870. 
 
 ```{r}
 wd_bands <- data.frame(wd)
@@ -222,8 +227,15 @@ ggplot(wd_bands_count, aes(fill = Decision, y = n, x = Writing_Score_Bands)) +
   ggtitle("Comparison of Waitlist vs Decline Writing Scores")
 ```
 
+We see a similar trend in the writing scores, with declined students typically having scores lower than 80 and waitlisted students typically having scores above 80. 
+
+It is important to note that there are students who have been declined who have higher GPAs, test scores, and writing scores than many of the waitlisted students. Why may that be? Let's explore this trend further below. 
 
 ## Case Study
+
+Have a look at the following three candidates. 
+
+Candidate 1: 
 
 ```{r}
 decline <- wd[wd$Decision == "Decline", ]
@@ -232,7 +244,7 @@ max_gpa_d <- decline[decline$GPA == max(decline$GPA), ]
 max_gpa_d %>% gt()
 ```
 
-
+Candidate 2: 
 
 ```{r}
 admit <- data[data$Decision == "Admit", ]
@@ -240,6 +252,8 @@ admit <- subset(admit, select = -c(...1))
 max_gpa_a <- admit[admit$GPA >= 3.80 & admit$GPA <= 3.90, ][2, ]
 max_gpa_a %>% gt()
 ```
+
+Candidate 3:
 
 ```{r}
 waitlist <- data[data$Decision == "Waitlist", ]
@@ -249,7 +263,7 @@ max_gpa_w %>% gt()
 ```
 
 
-Based on GPA, we may be surprised that candidate 1 got declined. As we have seen, a 3.84 is well within the range for acceptance. Their test scores and writing scores were also on the higher end of the waitlist range. The question remains, why did this person get declined and not admitted, let alone waitlisted? The main difference we see between this candidate and the admitted candidates are the test and writing scores. Were these scores higher, perhaps they would have been admitted. There also was a difference in volunteer level. 
+All of these candidates are relatively similar across the board, but all received different decisions. I think many would be surprised that candidate 1 got declined. As we have seen, a 3.84 is well within the range for acceptance. Their test scores and writing scores were also on the higher end of the waitlist range. Though lower than the accepted candidate 2, the scores are by no means poor and are well within the waitlist range at least.  The question remains, why did this person get declined and not admitted, let alone waitlisted? The main difference we see between this candidate and the admitted and waitlisted candidates is the volunteer score. While volunteer score may be not significant for overall difference in groups, on an individual basis, this internship may be looking for students who put more effort into serving their community and volunteering. This theory would explain their declined status. 
 
 
 
