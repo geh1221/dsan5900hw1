@@ -5,6 +5,7 @@ format:
     code-fold: TRUE
     toc: true
     warning: false
+    echo: false
 editor: visual
 ---
 
