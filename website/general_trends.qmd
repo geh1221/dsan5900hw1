@@ -2,7 +2,10 @@
 title: "General Trends"
 execute:
   echo: false
-format: html
+format: 
+  html:
+    warning: false
+    code-fold: true 
 ---
 
 The dataset contains information about **79 students** applying to an internship. There are eight variables in the dataset related to a student's background, various test scores, and the internship hiring decision. These six variables are the state the student is from, **gender**, **GPA**, **test score**, **writing test score**, the number of years of **work experience** they have,the level of effort they put into **volunteering**, and their admission **decision** (admitted, waitlisted, or declined). We will first investigate trends by admission decision in these variables as well as how correlated they are with the admission decision. These trends will help inform the board of the most important factors that internship hiring committes are using.
@@ -91,7 +94,7 @@ ggplot(df_percent, aes(x = reorder(Gender, -percentage), y = percentage, fill = 
 
 ```{r}
 library(tidyr)
-wd <- read.csv("data/cleaned_data/data_cleaned.csv")
+wd <- read.csv("../data/cleaned_data/data_cleaned.csv")
 wd_bands <- data.frame(wd)
 #wd_bands <- subset(wd_bands, select = -c(...1))
 wd_bands <- wd_bands %>% 

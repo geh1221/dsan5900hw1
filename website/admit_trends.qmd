@@ -4,6 +4,7 @@ format:
   html:
     code-fold: TRUE
     toc: true
+    warning: false
 editor: visual
 ---
 
@@ -12,13 +13,8 @@ library(tidyverse)
 library(ggplot2)
 library(gt)
 library(forcats)
-```
 
-```{r}
 data <- read.csv("../data/cleaned_data/data_cleaned.csv")
-```
-
-```{r}
 data %>%
   mutate(Decision = fct_relevel(Decision, "Admit", "Waitlist", "Decline")) %>%
   group_by(Decision) %>%

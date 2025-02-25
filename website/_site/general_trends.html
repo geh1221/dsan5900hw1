@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>2025 Student Internship Report - website</title>
+<title>2025 Student Internship Report - General Trends</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -89,11 +89,11 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
+    <a class="nav-link" href="./index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./general_trends.html"> 
+    <a class="nav-link active" href="./general_trends.html" aria-current="page"> 
 <span class="menu-text">Data Overview and Trends</span></a>
   </li>  
   <li class="nav-item">
@@ -116,14 +116,28 @@ ul.task-list li input[type="checkbox"] {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#admission-decisions" id="toc-admission-decisions" class="nav-link active" data-scroll-target="#admission-decisions">Admission Decisions</a></li>
+  <li><a href="#state" id="toc-state" class="nav-link" data-scroll-target="#state">State</a></li>
+  <li><a href="#gender" id="toc-gender" class="nav-link" data-scroll-target="#gender">Gender</a></li>
+  <li><a href="#gpa" id="toc-gpa" class="nav-link" data-scroll-target="#gpa">GPA</a></li>
+  <li><a href="#test-scores" id="toc-test-scores" class="nav-link" data-scroll-target="#test-scores">Test Scores</a></li>
+  <li><a href="#writing-scores" id="toc-writing-scores" class="nav-link" data-scroll-target="#writing-scores">Writing Scores</a></li>
+  <li><a href="#work-experience" id="toc-work-experience" class="nav-link" data-scroll-target="#work-experience">Work Experience</a></li>
+  <li><a href="#volunteer-experience" id="toc-volunteer-experience" class="nav-link" data-scroll-target="#volunteer-experience">Volunteer Experience</a></li>
+  <li><a href="#correlations" id="toc-correlations" class="nav-link" data-scroll-target="#correlations">Correlations</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">website</h1>
+<h1 class="title">General Trends</h1>
 </div>
 
 
@@ -140,10 +154,119 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>This is a Quarto website.</p>
-<p>To learn more about Quarto websites visit <a href="https://quarto.org/docs/websites" class="uri">https://quarto.org/docs/websites</a>.</p>
+<p>The dataset contains information about <strong>79 students</strong> applying to an internship. There are eight variables in the dataset related to a student’s background, various test scores, and the internship hiring decision. These six variables are the state the student is from, <strong>gender</strong>, <strong>GPA</strong>, <strong>test score</strong>, <strong>writing test score</strong>, the number of years of <strong>work experience</strong> they have,the level of effort they put into <strong>volunteering</strong>, and their admission <strong>decision</strong> (admitted, waitlisted, or declined). We will first investigate trends by admission decision in these variables as well as how correlated they are with the admission decision. These trends will help inform the board of the most important factors that internship hiring committes are using.</p>
+<section id="admission-decisions" class="level2">
+<h2 class="anchored" data-anchor-id="admission-decisions">Admission Decisions</h2>
+<p>The same percentage of students were admitted and declined, 35.4%. Slighly less students, 29.1%, were waitlisted. Overall, admissions decisions were split relatively equally.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="general_trends_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="state" class="level2">
+<h2 class="anchored" data-anchor-id="state">State</h2>
+<p>Applicants came from 10 states, with Florida having the most applicants, followed by Colorado and California. California had the highest percentage of admits compared to other states. No students from states with only one applicant were admitted. All four applicants from Virginia were declined. Overall, admission decisions appear to vary across states so we can assume that the state a applicant is from could affect their admission decision.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="general_trends_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="gender" class="level2">
+<h2 class="anchored" data-anchor-id="gender">Gender</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="general_trends_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="gpa" class="level2">
+<h2 class="anchored" data-anchor-id="gpa">GPA</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="general_trends_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="test-scores" class="level2">
+<h2 class="anchored" data-anchor-id="test-scores">Test Scores</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="general_trends_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="writing-scores" class="level2">
+<h2 class="anchored" data-anchor-id="writing-scores">Writing Scores</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="general_trends_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="work-experience" class="level2">
+<h2 class="anchored" data-anchor-id="work-experience">Work Experience</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="general_trends_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="volunteer-experience" class="level2">
+<h2 class="anchored" data-anchor-id="volunteer-experience">Volunteer Experience</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="general_trends_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="correlations" class="level2">
+<h2 class="anchored" data-anchor-id="correlations">Correlations</h2>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="general_trends_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
