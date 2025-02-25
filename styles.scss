@@ -1,0 +1,32 @@
+/*-- scss:defaults --*/
+
+// Import fonts 
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+// Font Size 
+
+
+// Colors 
+$green: yellowgreen;
+$yellow: #ffb90f;
+$red:  firebrick;
+#black: black;
+$beige: #eeeeee;
+
+// Base Document Colors 
+$navbar-bg: $black; // navbar 
+$navbar-fg: $black; // navbar foreground elements 
+$navbar-hl: $yellow; // highlight color when hovering over navbar links 
+$body-bg: $beige; // page background 
+$body-color: $black; // page text 
+$footer-bg: $red; // footer 
+$link_color: $green; // hyperlinks 
+
+// Inline Code 
+$code-bg: $red; // inline code background colors 
+$code-color: $red; // inline code text color 
+
+// Code Blocks 
+$code-block-bg: $beige; // code block background color
+
+/*-- scss:rules --*/
