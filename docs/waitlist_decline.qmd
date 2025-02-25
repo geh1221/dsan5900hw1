@@ -19,7 +19,7 @@ library(gt)
 After exploring some of the trends between students who were admitted versus students who were declined or waitlisted, we felt it was also important to look more at what the difference was between a student getting declined or waitlisted. First, here are the differences between the averages of all of the testing scores, GPA, volunteer levels, and work experience between these two groups. 
 
 ```{r}
-data <- read_csv("data/cleaned_data/data_cleaned.csv")
+data <- read_csv("../data/cleaned_data/data_cleaned.csv")
 wd <- data[data$Decision != "Admit", ]
 num_vars <- subset(wd, select = -c(State, ...1))
 num_vars <- subset(wd, select = -c(State, ...1))
