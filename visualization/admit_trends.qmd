@@ -1,0 +1,232 @@
+---
+title: "Admit Trends"
+format: 
+  html:
+    code-fold: TRUE
+    toc: true
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(gt)
+library(forcats)
+```
+
+```{r}
+data <- read.csv("../data/cleaned_data/data_cleaned.csv")
+```
+
+```{r}
+data %>%
+  mutate(Decision = fct_relevel(Decision, "Admit", "Waitlist", "Decline")) %>%
+  group_by(Decision) %>%
+  summarize("Test Score" = mean(TestScore), "Writing Score" = mean(WritingScore), "GPA" = mean(GPA), "Work Experience" = mean(WorkExp), "Volunteer Level" = mean(VolunteerLevel)) %>%
+  gt() %>%
+  fmt_number(
+    columns = c(`GPA`), 
+    decimals = 2,
+    use_seps = FALSE
+  ) %>%
+  fmt_number(
+    columns = c(`Test Score`, `Writing Score`, `Work Experience`, `Volunteer Level`), 
+    decimals = 1,
+    use_seps = FALSE
+  )%>%
+  tab_header(title = md("Average scores for students by decision"))
+```
+
+### Exploring Student Statistics Based on Admit Decision
+
+```{r}
+data %>%
+  mutate(Decision = fct_relevel(Decision, "Decline", "Waitlist", "Admit")) %>%
+  group_by(Decision) %>%
+  summarize("Test Score" = mean(TestScore), "Writing Score" = mean(WritingScore), "GPA" = mean(GPA), "Work Experience" = mean(WorkExp), "Volunteer Level" = mean(VolunteerLevel)) %>%
+  ggplot() + geom_col(aes(y = Decision, x = `Test Score`, fill = Decision)) + scale_fill_manual(values = c("firebrick", "gray90", "yellowgreen")) + theme_minimal() + labs(title = "Admission decision by test score", x = "Average Test Score") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+data %>%
+  mutate(Decision = fct_relevel(Decision, "Decline", "Waitlist", "Admit")) %>%
+  group_by(Decision) %>%
+  summarize("Test Score" = mean(TestScore), "Writing Score" = mean(WritingScore), "GPA" = mean(GPA), "Work Experience" = mean(WorkExp), "Volunteer Level" = mean(VolunteerLevel)) %>%
+  ggplot() + geom_col(aes(y = Decision, x = `Writing Score`, fill = Decision)) + scale_fill_manual(values = c("firebrick", "gray90", "yellowgreen")) + theme_minimal() + labs(title = "Admission decision by writing score", x = "Average Writing Score") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+data %>%
+  mutate(Decision = fct_relevel(Decision, "Decline", "Waitlist", "Admit")) %>%
+  group_by(Decision) %>%
+  summarize("Test Score" = mean(TestScore), "Writing Score" = mean(WritingScore), "GPA" = mean(GPA), "Work Experience" = mean(WorkExp), "Volunteer Level" = mean(VolunteerLevel)) %>%
+  ggplot() + geom_col(aes(y = Decision, x = `GPA`, fill = Decision)) + scale_fill_manual(values = c("firebrick", "gray90", "yellowgreen")) + theme_minimal() + labs(title = "Admission decision by GPA", x= "Average GPA") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+data %>%
+  mutate(Decision = fct_relevel(Decision, "Decline", "Waitlist", "Admit")) %>%
+  group_by(Decision) %>%
+  summarize("Test Score" = mean(TestScore), "Writing Score" = mean(WritingScore), "GPA" = mean(GPA), "Work Experience" = mean(WorkExp), "Volunteer Level" = mean(VolunteerLevel)) %>%
+  ggplot() + geom_col(aes(y = Decision, x = `Volunteer Level`, fill = Decision)) + scale_fill_manual(values = c("firebrick", "gray90", "yellowgreen")) + theme_minimal() + labs(title = "Admission decision by volunteer level", x = "Average Volunteer Level") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+data %>%
+  mutate(Decision = fct_relevel(Decision, "Decline", "Waitlist", "Admit")) %>%
+  group_by(Decision) %>%
+  summarize("Test Score" = mean(TestScore), "Writing Score" = mean(WritingScore), "GPA" = mean(GPA), "Work Experience" = mean(WorkExp), "Volunteer Level" = mean(VolunteerLevel)) %>%
+  ggplot() + geom_col(aes(y = Decision, x = `Work Experience`, fill = Decision)) + scale_fill_manual(values = c("firebrick", "gray90", "yellowgreen")) + theme_minimal() + labs(title = "Admission decision by work experience", x = "Average Work Experience (years)") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+### Proportions of Admissions Based on Each Variable
+
+#### Demographics
+
+```{r}
+data$Gender <- as.factor(data$Gender)
+
+data %>%
+  mutate(Decision = fct_relevel(Decision, "Waitlist", "Decline", "Admit")) %>%
+  mutate(Gender = ifelse(Gender == 0,"Female","Male")) %>%
+  ggplot() + geom_bar(aes(y = Gender, fill = Decision), position = "fill") + scale_fill_manual(values = c("gray90", "firebrick", "yellowgreen")) + theme_minimal()  +labs(title = "Admission proportion by gender", x = "Proportion") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+data %>%
+  mutate(Decision = fct_relevel(Decision, "Waitlist", "Decline", "Admit")) %>%
+  ggplot() + geom_bar(aes(y = State, fill = Decision), position = "fill") + scale_fill_manual(values = c("gray90", "firebrick", "yellowgreen")) + theme_minimal()  +labs(title = "Admission proportion by state", x = "Proportion") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+#### Scores
+
+```{r}
+data %>%
+  mutate(Decision = fct_relevel(Decision, "Waitlist", "Decline", "Admit")) %>%
+  ggplot() + geom_bar(aes(y = State, fill = Decision), position = "fill") + scale_fill_manual(values = c("gray90", "firebrick", "yellowgreen")) + theme_minimal()  +labs(title = "Admission proportion by gender", x = "Proportion") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+data %>%
+  mutate(Decision = fct_relevel(Decision, "Waitlist", "Decline", "Admit")) %>%
+  mutate(GPA = ifelse(GPA >= 3.9,"3.9+",
+                    ifelse(GPA >= 3.8,"3.8-3.9",
+                           ifelse(GPA >= 3.7,"3.7-3.8",
+                                  ifelse(GPA >= 3.6,"3.6-3.7",
+                                         ifelse(GPA >= 3.5,"3.5-3.6",
+                                          ifelse(GPA >= 3.4,"3.4-3.5",
+                                          ifelse(GPA >= 3.3,"3.3-3.4",
+                                          ifelse(GPA >= 3.2,"3.2-3.3",
+                                          ifelse(GPA >= 3.1,"3.1-3.2",
+                                          ifelse(GPA >= 3.0,"3.0-3.1", "3.0 or Lower"))))))))))) %>%
+  ggplot() + geom_bar(aes(y = GPA, fill = Decision), position = "fill") + scale_fill_manual(values = c("gray90", "firebrick", "yellowgreen")) + theme_minimal()  +labs(title = "Admission proportion by GPA", x = "Proportion") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+data %>%
+  mutate(Decision = fct_relevel(Decision, "Waitlist", "Decline", "Admit")) %>%
+  mutate(TestScore = ifelse(TestScore >= 900,"900 or higher",
+                    ifelse(TestScore >= 800,"800 to 900","799 or lower"))) %>%
+  ggplot() + geom_bar(aes(y = TestScore, fill = Decision), position = "fill") + scale_fill_manual(values = c("gray90", "firebrick", "yellowgreen")) + theme_minimal()  +labs(title = "Admission proportion by test score", x = "Proportion", y = "Test Score") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+data %>%
+  mutate(Decision = fct_relevel(Decision, "Waitlist", "Decline", "Admit")) %>%
+  mutate(WritingScore = ifelse(WritingScore >= 90,"90 or higher",
+                    ifelse(WritingScore >= 80,"80 to 90","79 or lower"))) %>%
+  ggplot() + geom_bar(aes(y = WritingScore, fill = Decision), position = "fill") + scale_fill_manual(values = c("gray90", "firebrick", "yellowgreen")) + theme_minimal()  +labs(title = "Admission proportion by writing score", x = "Proportion", y = "Writing Score") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+#### Experience
+
+```{r}
+data %>%
+  mutate(Decision = fct_relevel(Decision, "Waitlist", "Decline", "Admit")) %>%
+  ggplot() + geom_bar(aes(y = VolunteerLevel, fill = Decision), position = "fill") + scale_fill_manual(values = c("gray90", "firebrick", "yellowgreen")) + theme_minimal()  +labs(title = "Admission proportion by volunteer level", x = "Proportion", y = "Volunteer Level") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+data$WorkExpquintile <- ntile(data$WorkExp, 5)
+
+data %>%
+  mutate(Decision = fct_relevel(Decision, "Waitlist", "Decline", "Admit")) %>%
+  ggplot() + geom_bar(aes(y = WorkExpquintile, fill = Decision), position = "fill") + scale_fill_manual(values = c("gray90", "firebrick", "yellowgreen")) + theme_minimal()  +labs(title = "Admission proportion by work experience", x = "Proportion", y = "Work Experience (in quintiles)") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+### Correlation Between Variables
+
+```{r}
+library(reshape2)
+corr_data <- data %>%
+  mutate(Decision = ifelse(Decision == "Admit",1,
+                           ifelse(Decision == "Waitlist", 0,
+                                  ifelse(Decision == "Decline", -1, NA)))) %>%
+  subset(select = -c(X, State, WorkExpquintile))
+corr_data$Gender <- as.numeric(corr_data$Gender)
+
+corr_mat <- round(cor(corr_data),2)
+dist <- as.dist((1-corr_mat)/2)
+hc <- hclust(dist)
+corr_mat <-corr_mat[hc$order, hc$order]
+```
+
+```{r}
+
+melted_corr_mat <- melt(corr_mat)
+
+melted_corr_mat <- melted_corr_mat %>%
+  mutate(row = as.numeric(factor(Var1, levels = colnames(corr_mat))),
+         col = as.numeric(factor(Var2, levels = colnames(corr_mat)))) %>%
+  filter(row >= col)
+ggplot(data = melted_corr_mat, aes(x=Var1, y=Var2,
+                                   fill=value)) + 
+geom_tile() + theme_minimal() + labs(title = "Correlation between all variables", x = "Variable 1", y = "Variable 2") + theme(plot.title = element_text(hjust = 0.5)) + scale_fill_gradient(low = "grey75", high = "grey25")
+```
+
+### Relationship Between Test Score and Other Variables
+
+#### Demographics
+
+```{r}
+data %>%
+  group_by(Gender) %>%
+  summarize(`Test Score` = mean(TestScore)) %>%
+  ggplot() + geom_col(aes(x = Gender, y = `Test Score`), fill = "grey70") + theme_minimal()
+
+```
+
+```{r}
+data %>%
+  group_by(State) %>%
+  summarize(`Test Score` = mean(TestScore), `Percent Admitted` = mean(Decision == "Admit")) %>%
+  ggplot() + geom_col(aes(x = State, y = `Test Score`, fill = `Percent Admitted`)) + scale_fill_gradient(low = "grey70", high = "yellowgreen") + theme_minimal() + coord_flip()
+```
+
+#### Scores
+
+```{r}
+data %>%
+  mutate(Decision = fct_relevel(Decision, "Admit", "Waitlist", "Decline")) %>%
+  ggplot() + geom_point(aes(x=TestScore, y=GPA, color = Decision)) + scale_color_manual(values = c("yellowgreen", "gray35", "firebrick")) +theme_minimal() + theme(plot.title = element_text(hjust = 0.5)) + labs(title = "GPA and Test Score", x = "Test Score")
+```
+
+```{r}
+data %>%
+  mutate(Decision = fct_relevel(Decision, "Admit", "Waitlist", "Decline")) %>%
+  ggplot() + geom_point(aes(x=TestScore, y=WritingScore, color = Decision)) + scale_color_manual(values = c("yellowgreen", "gray35", "firebrick")) +theme_minimal() + theme(plot.title = element_text(hjust = 0.5)) + labs(title = "Writing Score and Test Score", x = "Test Score", y = "Writing Score")
+```
+
+#### Experience
+
+```{r}
+data %>%
+  mutate(Decision = fct_relevel(Decision, "Admit", "Waitlist", "Decline")) %>%
+  ggplot() + geom_point(aes(x=TestScore, y=WorkExp, color = Decision)) + scale_color_manual(values = c("yellowgreen", "gray35", "firebrick")) +theme_minimal() + theme(plot.title = element_text(hjust = 0.5)) + labs(title = "Work Experience and Test Score", x = "Test Score", y = "Work Experience (years)")
+```
+
+```{r}
+data %>%
+  mutate(Decision = fct_relevel(Decision, "Admit", "Waitlist", "Decline")) %>%
+  ggplot() + geom_point(aes(x=TestScore, y=VolunteerLevel, color = Decision)) + scale_color_manual(values = c("yellowgreen", "gray35", "firebrick")) +theme_minimal() + theme(plot.title = element_text(hjust = 0.5)) + labs(title = "Volunteer Level and Test Score", x = "Test Score", y = "Volunteer Level")
+```

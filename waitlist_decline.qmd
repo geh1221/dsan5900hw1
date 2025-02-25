@@ -1,0 +1,269 @@
+---
+title: "Analysing the Waitlist and Decline Groups"
+format:
+  html:
+    code-fold: true
+    embed-resources: true
+    warning: false
+    echo: false
+---
+
+```{r}
+library(tidyverse)
+library(corrplot)
+library(gt)
+```
+
+## Overview of Waitlist vs Decline Groups
+
+After exploring some of the trends between students who were admitted versus students who were declined or waitlisted, we felt it was also important to look more at what the difference was between a student getting declined or waitlisted. First, here are the differences between the averages of all of the testing scores, GPA, volunteer levels, and work experience between these two groups. 
+
+```{r}
+data <- read_csv("data/cleaned_data/data_cleaned.csv")
+wd <- data[data$Decision != "Admit", ]
+num_vars <- subset(wd, select = -c(State, ...1))
+num_vars <- subset(wd, select = -c(State, ...1))
+num_vars %>% group_by(Decision) %>%
+  summarise("GPA" = mean(GPA), 
+            "Work Experience" = mean(WorkExp), 
+            "Test Score" = mean(TestScore), 
+            "Writing Score" = mean(WritingScore), 
+            "Volunteer Level" = mean(VolunteerLevel)) %>% 
+  gt() %>%
+  tab_style(
+    style = cell_fill(color = "#FFF3CD"),  
+    locations = cells_body(
+      columns = GPA,
+      rows = GPA == max(GPA)
+    )
+  ) %>%
+  tab_style(
+    style = cell_fill(color = "#FFF3CD"),
+    locations = cells_body(
+      columns = `Test Score`,
+      rows = `Test Score` == max(`Test Score`)
+    )
+  ) %>%
+  tab_style(
+    style = cell_fill(color = "#FFF3CD"),
+    locations = cells_body(
+      columns = `Work Experience`,
+      rows = `Work Experience` == max(`Work Experience`)
+    ) 
+  ) %>%
+  tab_style(
+    style = cell_fill(color = "#FFF3CD"),
+    locations = cells_body(
+      columns = `Volunteer Level`,
+      rows = `Volunteer Level` == max(`Volunteer Level`)
+    )
+  ) %>% 
+    tab_style(
+    style = cell_fill(color = "#FFF3CD"),
+    locations = cells_body(
+      columns = `Writing Score`,
+      rows = `Writing Score` == max(`Writing Score`)
+    )
+  )
+```
+
+From this table, we can see the students on the waitlist have higher scores in each categories. There appear to be bigger differences between GPA, Test Scores, and Writing Scores, than in work experience and volunteer level. We can do a statistical test to test for a difference in means. 
+
+```{r}
+gpa_tt <- t.test(GPA ~ Decision, data = wd, var.equal = FALSE) 
+work_tt <- t.test(WorkExp ~ Decision, data = wd, var.equal = FALSE)
+test_tt <- t.test(TestScore ~ Decision, data = wd, var.equal = FALSE)
+writ_tt <- t.test(WritingScore ~ Decision, data = wd, var.equal = FALSE)
+volunteer_tt <- t.test(VolunteerLevel ~ Decision, data = wd, var.equal = FALSE)
+
+tests <- c("GPA", "WorkExp", "TestScore", "WritingScore", "VolunteerLevel")
+p_vals <- data.frame(
+  variable = character(),    
+  p_value = numeric(),       
+  stringsAsFactors = FALSE   
+)
+
+for (variable in tests) {
+  formula <- as.formula(paste(variable, "~ Decision"))
+  test <- t.test(formula, data = wd, var.equal = FALSE) 
+  new_row <- data.frame(
+    variable = variable,
+    p_value = test$p.value,
+    p_value_formatted = "",  
+    stringsAsFactors = FALSE
+  )
+  
+  if (new_row$p_value < 0.001) {
+    new_row$p_value_formatted <- "< 0.001"
+  } else {
+    new_row$p_value_formatted <- sprintf("%.3f", new_row$p_value)
+  }
+  
+  p_vals <- rbind(p_vals, new_row)
+}
+
+p_vals %>%
+  select(variable, p_value_formatted) %>%  
+  rename("Variable" = variable,
+         "p-value" = p_value_formatted) %>%
+  gt() %>%
+  tab_style(
+    style = cell_fill(color = "#FFF3CD"), 
+    locations = cells_body(
+      columns = "p-value",
+      rows = p_vals$p_value < 0.05  
+    )
+  )
+
+```
+
+From this test, we see that there is a statistically significant difference in means between the decline and waitlist groups in GPA, Test Score, and Writing Score. These are the variables we will explore further to see how different they are between the waitlist/decline groups.
+
+## Exploring Significant Variables 
+
+```{r}
+wd_bands <- data.frame(wd)
+wd_bands <- subset(wd_bands, select = -c(...1))
+wd_bands <- wd_bands %>% 
+  mutate(GPA_Bands = case_when(
+    GPA < 2.40 ~ "< 2.40", 
+    GPA >= 2.40 & GPA <= 2.49 ~ "2.40-2.49", 
+    GPA >= 2.50 & GPA <= 2.59 ~ "2.50-2.59", 
+    GPA >= 2.60 & GPA <= 2.69 ~ "2.60-2.69", 
+    GPA >= 2.70 & GPA <= 2.79 ~ "2.70-2.79", 
+    GPA >= 2.80 & GPA <= 2.89 ~ "2.80-2.89", 
+    GPA >= 2.90 & GPA <= 2.99 ~ "2.90-2.99", 
+    GPA >= 3.00 & GPA <= 3.09 ~ "3.00-3.09", 
+    GPA >= 3.10 & GPA <= 3.19 ~ "3.10-3.19", 
+    GPA >= 3.20 & GPA <= 3.29 ~ "3.20-3.29", 
+    GPA >= 3.30 & GPA <= 3.39 ~ "3.30-3.39", 
+    GPA >= 3.40 & GPA <= 3.49 ~ "3.40-3.49", 
+    GPA >= 3.50 & GPA <= 3.59 ~ "3.50-3.59", 
+    GPA >= 3.60 & GPA <= 3.69 ~ "3.60-3.69", 
+    GPA >= 3.70 & GPA <= 3.79 ~ "3.70-3.79", 
+    GPA >= 3.80 & GPA <= 3.89 ~ "3.80-3.89", 
+    GPA >= 3.90 & GPA <= 3.99 ~ "3.90-3.99", 
+    GPA == 4.00 ~ "4.00"
+  ))
+
+wd_bands_count <- wd_bands %>%
+  count(GPA_Bands, Decision) %>%
+  complete(GPA_Bands, Decision, fill = list(n = 0))
+
+ggplot(wd_bands_count, aes(fill = Decision, y = n, x = GPA_Bands)) + 
+  geom_bar(position = "dodge", stat = "identity") +
+  scale_fill_manual(values = c("Decline" = "firebrick", "Waitlist" = "darkgoldenrod1")) +
+  theme_minimal() +
+  labs(x = "GPA Bands", y = "Count", fill = "Decision") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  ggtitle("Comparison of Waitlist vs Decline GPA")
+```
+
+In terms of GPA, we see that the waitlisted students' GPAs range between 3.20 and 3.59, whereas the declined students' GPAs are across the board.
+
+```{r}
+wd_bands <- data.frame(wd)
+wd_bands <- subset(wd_bands, select = -c(...1))
+wd_bands <- wd_bands %>% 
+  mutate(Test_Score_Bands = case_when(
+    TestScore < 760 ~ "< 760", 
+    TestScore >= 760 & TestScore <= 769 ~ "760-769", 
+    TestScore >= 770 & TestScore <= 779 ~ "770-779", 
+    TestScore >= 780 & TestScore <= 789 ~ "780-789", 
+    TestScore >= 790 & TestScore <= 799 ~ "790-799", 
+    TestScore >= 800 & TestScore <= 809 ~ "800-809", 
+    TestScore >= 810 & TestScore <= 819 ~ "810-819", 
+    TestScore >= 820 & TestScore <= 829 ~ "820-829", 
+    TestScore >= 830 & TestScore <= 839 ~ "830-839", 
+    TestScore >= 840 & TestScore <= 849 ~ "840-849", 
+    TestScore >= 850 & TestScore <= 859 ~ "850-859", 
+    TestScore >= 860 & TestScore <= 869 ~ "860-869", 
+    TestScore >= 870 & TestScore <= 879 ~ "870-879", 
+    TestScore >= 880 & TestScore <= 889 ~ "880-889", 
+    TestScore >= 890 & TestScore <= 899 ~ "890-899", 
+    TestScore > 900 ~ "> 900"
+  ))
+
+
+wd_bands_count <- wd_bands %>%
+  count(Test_Score_Bands, Decision) %>%
+  complete(Test_Score_Bands, Decision, fill = list(n = 0))
+
+ggplot(wd_bands_count, aes(fill = Decision, y = n, x = Test_Score_Bands)) + 
+  geom_bar(position = "dodge", stat = "identity") +
+  scale_fill_manual(values = c("Decline" = "firebrick", "Waitlist" = "darkgoldenrod1")) +
+  theme_minimal() +
+  labs(x = "Test Score Bands", y = "Count", fill = "Decision") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  ggtitle("Comparison of Waitlist vs Decline Test Scores")
+```
+In this exploration of the test scores for waitlisted and declined students, we see that declined students tended to have lower test scores, with scores typically being below 800, whereas all waitlisted students had scores between 850-870. 
+
+```{r}
+wd_bands <- data.frame(wd)
+wd_bands <- subset(wd_bands, select = -c(...1))
+wd_bands <- wd_bands %>% 
+  mutate(Writing_Score_Bands = case_when(
+    WritingScore < 60 ~ "< 60", 
+    WritingScore >= 60 & WritingScore <= 64 ~ "60-64", 
+    WritingScore >= 65 & WritingScore <= 69 ~ "65-69", 
+    WritingScore >= 70 & WritingScore <= 74 ~ "70-74", 
+    WritingScore >= 75 & WritingScore <= 79 ~ "75-79", 
+    WritingScore >= 80 & WritingScore <= 84 ~ "80-84", 
+    WritingScore >= 85 & WritingScore <= 89 ~ "85-89", 
+    WritingScore > 90 ~ "> 90"
+  ))
+
+wd_bands_count <- wd_bands %>%
+  count(Writing_Score_Bands, Decision) %>%
+  complete(Writing_Score_Bands, Decision, fill = list(n = 0))
+
+ggplot(wd_bands_count, aes(fill = Decision, y = n, x = Writing_Score_Bands)) + 
+  geom_bar(position = "dodge", stat = "identity") +
+  scale_fill_manual(values = c("Decline" = "firebrick", "Waitlist" = "darkgoldenrod1")) +
+  theme_minimal() +
+  labs(x = "Writing Score Bands", y = "Count", fill = "Decision") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+  ggtitle("Comparison of Waitlist vs Decline Writing Scores")
+```
+
+We see a similar trend in the writing scores, with declined students typically having scores lower than 80 and waitlisted students typically having scores above 80. 
+
+It is important to note that there are students who have been declined who have higher GPAs, test scores, and writing scores than many of the waitlisted students. Why may that be? Let's explore this trend further below. 
+
+## Case Study
+
+Have a look at the following three candidates. 
+
+Candidate 1: 
+
+```{r}
+decline <- wd[wd$Decision == "Decline", ]
+decline <- subset(decline, select = -c(...1))
+max_gpa_d <- decline[decline$GPA == max(decline$GPA), ] 
+max_gpa_d %>% gt()
+```
+
+Candidate 2: 
+
+```{r}
+admit <- data[data$Decision == "Admit", ]
+admit <- subset(admit, select = -c(...1))
+max_gpa_a <- admit[admit$GPA >= 3.80 & admit$GPA <= 3.90, ][2, ]
+max_gpa_a %>% gt()
+```
+
+Candidate 3:
+
+```{r}
+waitlist <- data[data$Decision == "Waitlist", ]
+waitlist <- subset(waitlist, select = -c(...1))
+max_gpa_w <- waitlist[waitlist$GPA == max(waitlist$GPA), ]
+max_gpa_w %>% gt()
+```
+
+
+All of these candidates are relatively similar across the board, but all received different decisions. I think many would be surprised that candidate 1 got declined. As we have seen, a 3.84 is well within the range for acceptance. Their test scores and writing scores were also on the higher end of the waitlist range. Though lower than the accepted candidate 2, the scores are by no means poor and are well within the waitlist range at least.  The question remains, why did this person get declined and not admitted, let alone waitlisted? The main difference we see between this candidate and the admitted and waitlisted candidates is the volunteer score. While volunteer score may be not significant for overall difference in groups, on an individual basis, this internship may be looking for students who put more effort into serving their community and volunteering. This theory would explain their declined status. 
+
+
+
