@@ -97,6 +97,10 @@ ul.task-list li input[type="checkbox"] {
     <a class="nav-link" href="./waitlist_decline.html" rel="" target="">
  <span class="menu-text">Waitlist and Decline Trends</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./recommendations.html" rel="" target="">
+ <span class="menu-text">Recommendations</span></a>
+  </li>  
 </ul>
             <div class="quarto-navbar-tools ms-auto">
 </div>
@@ -114,6 +118,7 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#admission-decisions" id="toc-admission-decisions" class="nav-link active" data-scroll-target="#admission-decisions">Admission Decisions</a></li>
+  <li><a href="#correlations" id="toc-correlations" class="nav-link" data-scroll-target="#correlations">Correlations</a></li>
   <li><a href="#state" id="toc-state" class="nav-link" data-scroll-target="#state">State</a></li>
   <li><a href="#gender" id="toc-gender" class="nav-link" data-scroll-target="#gender">Gender</a></li>
   <li><a href="#gpa" id="toc-gpa" class="nav-link" data-scroll-target="#gpa">GPA</a></li>
@@ -121,7 +126,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#writing-scores" id="toc-writing-scores" class="nav-link" data-scroll-target="#writing-scores">Writing Scores</a></li>
   <li><a href="#work-experience" id="toc-work-experience" class="nav-link" data-scroll-target="#work-experience">Work Experience</a></li>
   <li><a href="#volunteer-experience" id="toc-volunteer-experience" class="nav-link" data-scroll-target="#volunteer-experience">Volunteer Experience</a></li>
-  <li><a href="#correlations" id="toc-correlations" class="nav-link" data-scroll-target="#correlations">Correlations</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
   </ul>
 </nav>
     </div>
@@ -148,10 +153,20 @@ ul.task-list li input[type="checkbox"] {
 <p>The dataset contains information about <strong>79 students</strong> applying to an internship. There are eight variables in the dataset related to a student’s background, various test scores, and the internship hiring decision. These six variables are the state the student is from, <strong>gender</strong>, <strong>GPA</strong>, <strong>test score</strong>, <strong>writing test score</strong>, the number of years of <strong>work experience</strong> they have,the level of effort they put into <strong>volunteering</strong>, and their admission <strong>decision</strong> (admitted, waitlisted, or declined). We will first investigate trends by admission decision in these variables as well as how correlated they are with the admission decision. These trends will help inform the board of the most important factors that internship hiring committes are using.</p>
 <section id="admission-decisions" class="level2">
 <h2 class="anchored" data-anchor-id="admission-decisions">Admission Decisions</h2>
-<p>The same percentage of students were admitted and declined, 35.4%. Slighly less students, 29.1%, were waitlisted. Overall, admissions decisions were split relatively equally.</p>
+<p>The same percentage of students were admitted and declined, 35.4%. Slighly less students, 29.1%, were waitlisted. Overall, admissions decisions were split relatively equally across types of decisions.</p>
 <div class="cell">
 <div class="cell-output-display">
 <p><img src="general_trends_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="correlations" class="level2">
+<h2 class="anchored" data-anchor-id="correlations">Correlations</h2>
+<p>For all of the variables except the states variable, we can compute correlation coefficients. The most correlated variable is test score. We can infer that the student’s with the highest test scores are most likely to be admitted. However, other variables may contribute to internship decisions. Gender was perfectly uncorrelated with internship decisions so we can infer that gender does not matter in the applicant process.</p>
+<p>Test Score, Writing Score, and GPA are all positively correlated with internship decisions and are also correlated with each other. Volunteer Level and Work Experience are negatively correlated with admission decision and negatively correlated with eachother.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="general_trends_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -160,65 +175,78 @@ ul.task-list li input[type="checkbox"] {
 <p>Applicants came from 10 states, with Florida having the most applicants, followed by Colorado and California. California had the highest percentage of admits compared to other states. No students from states with only one applicant were admitted. All four applicants from Virginia were declined. Overall, admission decisions appear to vary across states so we can assume that the state a applicant is from could affect their admission decision.</p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="general_trends_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+<p><img src="general_trends_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
 <section id="gender" class="level2">
 <h2 class="anchored" data-anchor-id="gender">Gender</h2>
-<div class="cell">
-<div class="cell-output-display">
-<p><img src="general_trends_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</section>
-<section id="gpa" class="level2">
-<h2 class="anchored" data-anchor-id="gpa">GPA</h2>
+<p>There are <strong>45 male applicants</strong> and <strong>34 female applicants</strong>. The proportion of admits, waitlists, and declines are nearly identical across genders. This shows that gender is <strong>uncorrelated with admission decision</strong>.</p>
 <div class="cell">
 <div class="cell-output-display">
 <p><img src="general_trends_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
-<section id="test-scores" class="level2">
-<h2 class="anchored" data-anchor-id="test-scores">Test Scores</h2>
+<section id="gpa" class="level2">
+<h2 class="anchored" data-anchor-id="gpa">GPA</h2>
+<p>GPA is <strong>positively correlated</strong> with internship decision as shown by admitted students having the highest test scores, followed by waitlisted students and declined students. Declined students appear more uniform across the GPA bands compared to waitlisted or admitted students.</p>
 <div class="cell">
 <div class="cell-output-display">
 <p><img src="general_trends_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
-<section id="writing-scores" class="level2">
-<h2 class="anchored" data-anchor-id="writing-scores">Writing Scores</h2>
+<section id="test-scores" class="level2">
+<h2 class="anchored" data-anchor-id="test-scores">Test Scores</h2>
+<p>Internship Decisions are <strong>strongly positively correlated</strong> with test scores, as shown by the clear divisions of test scores among the groups besides a few outliers. Admitted students have the highest GPA, followed by waitlisted students and declined students.</p>
 <div class="cell">
 <div class="cell-output-display">
 <p><img src="general_trends_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
-<section id="work-experience" class="level2">
-<h2 class="anchored" data-anchor-id="work-experience">Work Experience</h2>
+<section id="writing-scores" class="level2">
+<h2 class="anchored" data-anchor-id="writing-scores">Writing Scores</h2>
+<p>Internship Decisions are <strong>positively correlated</strong> with writing test scores. Admitted students have the highest writing scores, followed by waitlisted students and declined students besides a few outliers.</p>
 <div class="cell">
 <div class="cell-output-display">
 <p><img src="general_trends_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
-<section id="volunteer-experience" class="level2">
-<h2 class="anchored" data-anchor-id="volunteer-experience">Volunteer Experience</h2>
+<section id="work-experience" class="level2">
+<h2 class="anchored" data-anchor-id="work-experience">Work Experience</h2>
+<p>By observing the plot below, we can see that work experience is <strong>uncorrelated</strong> with admission decision.</p>
 <div class="cell">
 <div class="cell-output-display">
 <p><img src="general_trends_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
-<section id="correlations" class="level2">
-<h2 class="anchored" data-anchor-id="correlations">Correlations</h2>
+<section id="volunteer-experience" class="level2">
+<h2 class="anchored" data-anchor-id="volunteer-experience">Volunteer Experience</h2>
+<p>By observing the plot below, we can see that volunteer experience is <strong>uncorrelated</strong> with admission decision.</p>
 <div class="cell">
 <div class="cell-output-display">
 <p><img src="general_trends_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<p>Strongly Correlated:</p>
+<ul>
+<li>Test Score</li>
+<li>Writing Test Score</li>
+<li>GPA</li>
+</ul>
+<p>Uncorrelated or Weakly Correlated:</p>
+<ul>
+<li>Gender</li>
+<li>Volunteer Experience</li>
+<li>Work Experience</li>
+</ul>
 
 
 </section>
