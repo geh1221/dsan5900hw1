@@ -9,7 +9,7 @@ The dataset contains information about **79 students** applying to an internship
 
 ## Admission Decisions
 
-The same percentage of students were admitted and declined, 35.4%. Slighly less students, 29.1%, were waitlisted. Overall, admissions decisions were split relatively equally. 
+The same percentage of students were admitted and declined, 35.4%. Slighly less students, 29.1%, were waitlisted. Overall, admissions decisions were split relatively equally across types of decisions. 
 
 ```{r}
 #| warning: false
@@ -41,6 +41,45 @@ ggplot(df, aes(x = Decision, fill = Decision)) +
     legend.position = "none"
   )
 ```
+
+## Correlations
+
+For all of the variables except the states variable, we can compute correlation coefficients. The most correlated variable is test score. We can infer that the student's with the highest test scores are most likely to be admitted. However, other variables may contribute to internship decisions. Gender was perfectly uncorrelated with internship decisions so we can infer that gender does not matter in the applicant process. 
+
+Test Score, Writing Score, and GPA are all positively correlated with internship decisions and are also correlated with each other. Volunteer Level and Work Experience are negatively correlated with admission decision and negatively correlated with eachother.
+
+```{r}
+#| warning: false
+library(dplyr)
+library(ggplot2)
+library(ggcorrplot)
+library(reshape2)
+
+df_corr <- df %>%
+  mutate(Decision_Num = case_when(
+    Decision == "Admit" ~ 1,
+    Decision == "Decline" ~ -1,
+    Decision == "Waitlist" ~ 0
+  )) %>%
+  mutate(Decision_Num = as.numeric(Decision_Num)) %>% select(-X)
+
+
+df_corr$Decision_Num <- as.numeric(as.character(df_corr$Decision_Num))
+
+colnames(df_corr) <- c("Decision","State", "GPA", "Work Experience", "Test Score", "Writing Score", "Gender", "Volunteer Level", "Decision") 
+
+corr_matrix <- cor(select(df_corr, where(is.numeric)), use = "complete.obs")
+
+
+ggcorrplot(corr_matrix, 
+           method = "circle", 
+           type = "lower", 
+           lab = TRUE, 
+           colors = c("firebrick", "darkgoldenrod1", "yellowgreen")) +
+  ggtitle("Correlations Between Variables")
+
+```
+
 ## State
 
 Applicants came from 10 states, with Florida having the most applicants, followed by Colorado and California. California had the highest percentage of admits compared to other states. No students from states with only one applicant were admitted. All four applicants from Virginia were declined. Overall, admission decisions appear to vary across states so we can assume that the state a applicant is from could affect their admission decision.
@@ -61,10 +100,12 @@ labs(title = "Decision Proportions Vary by State",
 
 ## Gender
 
+There are **45 male applicants** and **34 female applicants**. The proportion of admits, waitlists, and declines are nearly identical across genders. This shows that gender is **uncorrelated with admission decision**.
+
 ```{r}
 #| warning: false
 df_percent <- df %>%
-  mutate(Gender = factor(Gender, levels = c(0, 1), labels = c("Male", "Female")),
+  mutate(Gender = factor(Gender, levels = c(0, 1), labels = c("Female", "Male")),
          Decision = factor(Decision, levels = c("Decline", "Waitlist", "Admit"))) %>% 
   group_by(Gender, Decision) %>%
   summarise(count = n()) %>%
@@ -89,7 +130,10 @@ ggplot(df_percent, aes(x = reorder(Gender, -percentage), y = percentage, fill = 
 
 ## GPA
 
+GPA is **positively correlated** with internship decision as shown by admitted students having the highest test scores, followed by waitlisted students and declined students. Declined students appear more uniform across the GPA bands compared to waitlisted or admitted students. 
+
 ```{r}
+#| warning: false
 library(tidyr)
 wd <- read.csv("data/cleaned_data/data_cleaned.csv")
 wd_bands <- data.frame(wd)
@@ -130,6 +174,8 @@ ggplot(wd_bands_count, aes(fill = Decision, y = n, x = GPA_Bands)) +
 ```
 
 ## Test Scores
+
+Internship Decisions are **strongly positively correlated** with test scores, as shown by the clear divisions of test scores among the groups besides a few outliers. Admitted students have the highest GPA, followed by waitlisted students and declined students.
 
 ```{r}
 wd_bands <- wd_bands %>% 
@@ -175,6 +221,8 @@ ggplot(wd_bands_count, aes(fill = Decision, y = n, x = Test_Score_Bands)) +
 
 ## Writing Scores
 
+Internship Decisions are **positively correlated** with writing test scores. Admitted students have the highest writing scores, followed by waitlisted students and declined students besides a few outliers.
+
 ```{r}
 wd_bands <- wd_bands %>% 
   mutate(Writing_Score_Bands = case_when(
@@ -209,6 +257,8 @@ ggplot(wd_bands_count, aes(fill = Decision, y = n, x = Writing_Score_Bands)) +
 ```
 
 ## Work Experience
+
+By observing the plot below, we can see that work experience is **uncorrelated** with admission decision.
 
 ```{r}
 wd_bands <- wd_bands %>% 
@@ -246,6 +296,9 @@ ggplot(wd_bands_count, aes(fill = Decision, y = n, x = WorkExp_Bands)) +
 ```
 
 ## Volunteer Experience
+
+By observing the plot below, we can see that volunteer experience is **uncorrelated** with admission decision.
+
 ```{r}
 wd_bands_count <- wd_bands %>%
   count(VolunteerLevel, Decision) %>%
@@ -261,36 +314,16 @@ ggplot(wd_bands_count, aes(fill = Decision, y = n, x = as.factor(VolunteerLevel)
 ```
 
 
-## Correlations
-```{r}
-#| warning: false
-library(dplyr)
-library(ggplot2)
-library(ggcorrplot)
-library(reshape2)
+## Summary
 
-# Map Decision to numeric values
-df_corr <- df %>%
-  mutate(Decision_Num = case_when(
-    Decision == "Admit" ~ 1,
-    Decision == "Decline" ~ -1,
-    Decision == "Waitlist" ~ 0
-  )) %>%
-  mutate(Decision_Num = as.numeric(Decision_Num)) %>% select(-X)
+Strongly Correlated:
 
+* Test Score
+* Writing Test Score
+* GPA
 
-df_corr$Decision_Num <- as.numeric(as.character(df_corr$Decision_Num))
+Uncorrelated or Weakly Correlated: 
 
-colnames(df_corr) <- c("Decision","State", "GPA", "Work Experience", "Test Score", "Writing Score", "Gender", "Volunteer Level", "Decision") 
-
-corr_matrix <- cor(select(df_corr, where(is.numeric)), use = "complete.obs")
-
-
-ggcorrplot(corr_matrix, 
-           method = "circle", 
-           type = "lower", 
-           lab = TRUE, 
-           colors = c("firebrick", "darkgoldenrod1", "yellowgreen")) +
-  ggtitle("Correlations Between Variables")
-
-```
+* Gender
+* Volunteer Experience
+* Work Experience
