@@ -1,12 +1,15 @@
 project:
   type: website
+  resources: images/coverreal.png
 
 website:
   title: "2025 Student Internship Report"
   navbar:
     left:
-      - href: index.qmd
-        text: Home
+#      - href: index.qmd
+#        text: Home
+      - href: introduction.qmd
+        text: Introduction
       - href: general_trends.qmd
         text: Data Overview and Trends
       - href: admit_trends.qmd
@@ -18,8 +21,8 @@ website:
 
 format:
   html:
-    theme: cosmo
-    css: styles.scss
+    theme: 
+      - styles.scss
     toc: true
 
 

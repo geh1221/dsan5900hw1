@@ -1,0 +1,17 @@
+{
+  "hash": "82eadf714ee0cc2dfd667cfb6830d93f",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"General Trends\"\nexecute:\n  echo: false\nformat: \n  html:\n    warning: false\n    code-fold: true \n---\n\n\nThe dataset contains information about **79 students** applying to an internship. There are eight variables in the dataset related to a student's background, various test scores, and the internship hiring decision. These six variables are the state the student is from, **gender**, **GPA**, **test score**, **writing test score**, the number of years of **work experience** they have,the level of effort they put into **volunteering**, and their admission **decision** (admitted, waitlisted, or declined). We will first investigate trends by admission decision in these variables as well as how correlated they are with the admission decision. These trends will help inform the board of the most important factors that internship hiring committes are using.\n\n## Admission Decisions\n\nThe same percentage of students were admitted and declined, 35.4%. Slighly less students, 29.1%, were waitlisted. Overall, admissions decisions were split relatively equally. \n\n\n::: {.cell}\n::: {.cell-output-display}\n![](general_trends_files/figure-html/unnamed-chunk-1-1.png){width=672}\n:::\n:::\n\n## State\n\nApplicants came from 10 states, with Florida having the most applicants, followed by Colorado and California. California had the highest percentage of admits compared to other states. No students from states with only one applicant were admitted. All four applicants from Virginia were declined. Overall, admission decisions appear to vary across states so we can assume that the state a applicant is from could affect their admission decision.\n\n\n::: {.cell}\n::: {.cell-output-display}\n![](general_trends_files/figure-html/unnamed-chunk-2-1.png){width=672}\n:::\n:::\n\n\n## Gender\n\n\n::: {.cell}\n::: {.cell-output-display}\n![](general_trends_files/figure-html/unnamed-chunk-3-1.png){width=672}\n:::\n:::\n\n\n## GPA\n\n\n::: {.cell}\n::: {.cell-output-display}\n![](general_trends_files/figure-html/unnamed-chunk-4-1.png){width=672}\n:::\n:::\n\n\n## Test Scores\n\n\n::: {.cell}\n::: {.cell-output-display}\n![](general_trends_files/figure-html/unnamed-chunk-5-1.png){width=672}\n:::\n:::\n\n\n## Writing Scores\n\n\n::: {.cell}\n::: {.cell-output-display}\n![](general_trends_files/figure-html/unnamed-chunk-6-1.png){width=672}\n:::\n:::\n\n\n## Work Experience\n\n\n::: {.cell}\n::: {.cell-output-display}\n![](general_trends_files/figure-html/unnamed-chunk-7-1.png){width=672}\n:::\n:::\n\n\n## Volunteer Experience\n\n::: {.cell}\n::: {.cell-output-display}\n![](general_trends_files/figure-html/unnamed-chunk-8-1.png){width=672}\n:::\n:::\n\n\n\n## Correlations\n\n::: {.cell}\n::: {.cell-output-display}\n![](general_trends_files/figure-html/unnamed-chunk-9-1.png){width=672}\n:::\n:::",
+    "supporting": [
+      "general_trends_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

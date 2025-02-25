@@ -10,12 +10,12 @@
 $green: yellowgreen;
 $yellow: #ffb90f;
 $red:  firebrick;
-#black: black;
+$black: black;
 $beige: #eeeeee;
 
 // Base Document Colors 
-$navbar-bg: $black; // navbar 
-$navbar-fg: $black; // navbar foreground elements 
+$navbar-bg: $red; // navbar 
+$navbar-fg: $beige; // navbar foreground elements 
 $navbar-hl: $yellow; // highlight color when hovering over navbar links 
 $body-bg: $beige; // page background 
 $body-color: $black; // page text 
@@ -30,3 +30,15 @@ $code-color: $red; // inline code text color
 $code-block-bg: $beige; // code block background color
 
 /*-- scss:rules --*/
+
+.full-page-image {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: -1; /* Send the image to the background */
+}

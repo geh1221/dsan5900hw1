@@ -15,7 +15,7 @@ $beige: #eeeeee;
 
 // Base Document Colors 
 $navbar-bg: $black; // navbar 
-$navbar-fg: $black; // navbar foreground elements 
+$navbar-fg: $red; // navbar foreground elements 
 $navbar-hl: $yellow; // highlight color when hovering over navbar links 
 $body-bg: $beige; // page background 
 $body-color: $black; // page text 
@@ -30,3 +30,39 @@ $code-color: $red; // inline code text color
 $code-block-bg: $beige; // code block background color
 
 /*-- scss:rules --*/
+
+.navbar {
+  background-color: $navbar-bg !important;
+  color: $navbar-fg !important;
+}
+
+.navbar a {
+  color: $navbar-fg !important;
+}
+
+.navbar a:hover {
+  color: $navbar-hl !important;
+}
+
+body {
+  background-color: $body-bg !important;
+  color: $body-color !important;
+}
+
+footer {
+  background-color: $footer-bg !important;
+}
+
+a {
+  color: $link_color !important;
+}
+
+code {
+  background-color: $code-bg !important;
+  color: $code-color !important;
+}
+
+pre {
+  background-color: $code-block-bg !important;
+}
+
