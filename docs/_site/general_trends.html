@@ -20,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -97,6 +131,10 @@ ul.task-list li input[type="checkbox"] {
     <a class="nav-link" href="./waitlist_decline.html" rel="" target="">
  <span class="menu-text">Waitlist and Decline Trends</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./recomendations.qmd" rel="" target="">
+ <span class="menu-text">Recommendations</span></a>
+  </li>  
 </ul>
             <div class="quarto-navbar-tools ms-auto">
 </div>
@@ -114,6 +152,7 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#admission-decisions" id="toc-admission-decisions" class="nav-link active" data-scroll-target="#admission-decisions">Admission Decisions</a></li>
+  <li><a href="#correlations" id="toc-correlations" class="nav-link" data-scroll-target="#correlations">Correlations</a></li>
   <li><a href="#state" id="toc-state" class="nav-link" data-scroll-target="#state">State</a></li>
   <li><a href="#gender" id="toc-gender" class="nav-link" data-scroll-target="#gender">Gender</a></li>
   <li><a href="#gpa" id="toc-gpa" class="nav-link" data-scroll-target="#gpa">GPA</a></li>
@@ -121,7 +160,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#writing-scores" id="toc-writing-scores" class="nav-link" data-scroll-target="#writing-scores">Writing Scores</a></li>
   <li><a href="#work-experience" id="toc-work-experience" class="nav-link" data-scroll-target="#work-experience">Work Experience</a></li>
   <li><a href="#volunteer-experience" id="toc-volunteer-experience" class="nav-link" data-scroll-target="#volunteer-experience">Volunteer Experience</a></li>
-  <li><a href="#correlations" id="toc-correlations" class="nav-link" data-scroll-target="#correlations">Correlations</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
   </ul>
 </nav>
     </div>
@@ -148,10 +187,80 @@ ul.task-list li input[type="checkbox"] {
 <p>The dataset contains information about <strong>79 students</strong> applying to an internship. There are eight variables in the dataset related to a student’s background, various test scores, and the internship hiring decision. These six variables are the state the student is from, <strong>gender</strong>, <strong>GPA</strong>, <strong>test score</strong>, <strong>writing test score</strong>, the number of years of <strong>work experience</strong> they have,the level of effort they put into <strong>volunteering</strong>, and their admission <strong>decision</strong> (admitted, waitlisted, or declined). We will first investigate trends by admission decision in these variables as well as how correlated they are with the admission decision. These trends will help inform the board of the most important factors that internship hiring committes are using.</p>
 <section id="admission-decisions" class="level2">
 <h2 class="anchored" data-anchor-id="admission-decisions">Admission Decisions</h2>
-<p>The same percentage of students were admitted and declined, 35.4%. Slighly less students, 29.1%, were waitlisted. Overall, admissions decisions were split relatively equally.</p>
+<p>The same percentage of students were admitted and declined, 35.4%. Slighly less students, 29.1%, were waitlisted. Overall, admissions decisions were split relatively equally across types of decisions.</p>
 <div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"../data/cleaned_data/data_cleaned.csv"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>Decision <span class="ot">&lt;-</span> <span class="fu">factor</span>(df<span class="sc">$</span>Decision, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Decline"</span>, <span class="st">"Waitlist"</span>, <span class="st">"Admit"</span>))</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> Decision, <span class="at">fill =</span> Decision)) <span class="sc">+</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"count"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span> </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span> </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span> </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Admit"</span> <span class="ot">=</span> <span class="st">"yellowgreen"</span>, <span class="st">"Waitlist"</span> <span class="ot">=</span> <span class="st">"darkgoldenrod1"</span>, <span class="st">"Decline"</span> <span class="ot">=</span> <span class="st">"firebrick"</span>)) <span class="sc">+</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Admission Decisions are Fairly Well-Balanced"</span>,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Decision"</span>, </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Percentage of Students"</span>, </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Decision"</span>) <span class="sc">+</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> scales<span class="sc">::</span><span class="fu">percent</span>(..count..<span class="sc">/</span><span class="fu">sum</span>(..count..), <span class="at">accuracy =</span> <span class="fl">0.1</span>)),</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">stat =</span> <span class="st">"count"</span>, </span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">position =</span> <span class="fu">position_stack</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>), </span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">5</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> <span class="fu">theme</span>(</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.ticks =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.line =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"none"</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <p><img src="general_trends_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="correlations" class="level2">
+<h2 class="anchored" data-anchor-id="correlations">Correlations</h2>
+<p>For all of the variables except the states variable, we can compute correlation coefficients. The most correlated variable is test score. We can infer that the student’s with the highest test scores are most likely to be admitted. However, other variables may contribute to internship decisions. Gender was perfectly uncorrelated with internship decisions so we can infer that gender does not matter in the applicant process.</p>
+<p>Test Score, Writing Score, and GPA are all positively correlated with internship decisions and are also correlated with each other. Volunteer Level and Work Experience are negatively correlated with admission decision and negatively correlated with eachother.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggcorrplot)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reshape2)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>df_corr <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Decision_Num =</span> <span class="fu">case_when</span>(</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    Decision <span class="sc">==</span> <span class="st">"Admit"</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    Decision <span class="sc">==</span> <span class="st">"Decline"</span> <span class="sc">~</span> <span class="sc">-</span><span class="dv">1</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    Decision <span class="sc">==</span> <span class="st">"Waitlist"</span> <span class="sc">~</span> <span class="dv">0</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Decision_Num =</span> <span class="fu">as.numeric</span>(Decision_Num)) <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>X)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>df_corr<span class="sc">$</span>Decision_Num <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(df_corr<span class="sc">$</span>Decision_Num))</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(df_corr) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Decision"</span>,<span class="st">"State"</span>, <span class="st">"GPA"</span>, <span class="st">"Work Experience"</span>, <span class="st">"Test Score"</span>, <span class="st">"Writing Score"</span>, <span class="st">"Gender"</span>, <span class="st">"Volunteer Level"</span>, <span class="st">"Decision"</span>) </span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>corr_matrix <span class="ot">&lt;-</span> <span class="fu">cor</span>(<span class="fu">select</span>(df_corr, <span class="fu">where</span>(is.numeric)), <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="fu">ggcorrplot</span>(corr_matrix, </span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>           <span class="at">method =</span> <span class="st">"circle"</span>, </span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>           <span class="at">type =</span> <span class="st">"lower"</span>, </span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>           <span class="at">lab =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>           <span class="at">colors =</span> <span class="fu">c</span>(<span class="st">"firebrick"</span>, <span class="st">"darkgoldenrod1"</span>, <span class="st">"yellowgreen"</span>)) <span class="sc">+</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Correlations Between Variables"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="general_trends_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
@@ -159,66 +268,281 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="state">State</h2>
 <p>Applicants came from 10 states, with Florida having the most applicants, followed by Colorado and California. California had the highest percentage of admits compared to other states. No students from states with only one applicant were admitted. All four applicants from Virginia were declined. Overall, admission decisions appear to vary across states so we can assume that the state a applicant is from could affect their admission decision.</p>
 <div class="cell">
-<div class="cell-output-display">
-<p><img src="general_trends_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</section>
-<section id="gender" class="level2">
-<h2 class="anchored" data-anchor-id="gender">Gender</h2>
-<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Decision =</span> <span class="fu">factor</span>(Decision, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Decline"</span>, <span class="st">"Waitlist"</span>, <span class="st">"Admit"</span>)))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(State, <span class="fu">table</span>(State)[State]), <span class="at">fill =</span> Decision)) <span class="sc">+</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span> <span class="fu">coord_flip</span>() <span class="sc">+</span> </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span> <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Admit"</span> <span class="ot">=</span> <span class="st">"yellowgreen"</span>, <span class="st">"Waitlist"</span> <span class="ot">=</span> <span class="st">"darkgoldenrod1"</span>, </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="st">"Decline"</span> <span class="ot">=</span> <span class="st">"firebrick"</span>))  <span class="sc">+</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Decision Proportions Vary by State"</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"State"</span>, </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Number of Students"</span>, </span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Decision"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <p><img src="general_trends_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
-<section id="gpa" class="level2">
-<h2 class="anchored" data-anchor-id="gpa">GPA</h2>
+<section id="gender" class="level2">
+<h2 class="anchored" data-anchor-id="gender">Gender</h2>
+<p>There are <strong>45 male applicants</strong> and <strong>34 female applicants</strong>. The proportion of admits, waitlists, and declines are nearly identical across genders. This shows that gender is <strong>uncorrelated with admission decision</strong>.</p>
 <div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_percent <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Gender =</span> <span class="fu">factor</span>(Gender, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Female"</span>, <span class="st">"Male"</span>)),</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">Decision =</span> <span class="fu">factor</span>(Decision, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Decline"</span>, <span class="st">"Waitlist"</span>, <span class="st">"Admit"</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Gender, Decision) <span class="sc">%&gt;%</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Gender) <span class="sc">%&gt;%</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">percentage =</span> count <span class="sc">/</span> <span class="fu">sum</span>(count) <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df_percent, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(Gender, <span class="sc">-</span>percentage), <span class="at">y =</span> percentage, <span class="at">fill =</span> Decision)) <span class="sc">+</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span> </span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Admit"</span> <span class="ot">=</span> <span class="st">"yellowgreen"</span>, <span class="st">"Waitlist"</span> <span class="ot">=</span> <span class="st">"darkgoldenrod1"</span>, </span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>                               <span class="st">"Decline"</span> <span class="ot">=</span> <span class="st">"firebrick"</span>)) <span class="sc">+</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Decision Proportions are Nearly Identical Across Genders"</span>,</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Gender"</span>, </span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Percentage of Students"</span>, </span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Decision"</span>) <span class="sc">+</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste0</span>(<span class="fu">round</span>(percentage, <span class="dv">1</span>), <span class="st">"%"</span>)), </span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>            <span class="at">position =</span> <span class="fu">position_stack</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>),</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="dv">4</span>, <span class="at">color =</span> <span class="st">"black"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <p><img src="general_trends_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
-<section id="test-scores" class="level2">
-<h2 class="anchored" data-anchor-id="test-scores">Test Scores</h2>
+<section id="gpa" class="level2">
+<h2 class="anchored" data-anchor-id="gpa">GPA</h2>
+<p>GPA is <strong>positively correlated</strong> with internship decision as shown by admitted students having the highest test scores, followed by waitlisted students and declined students. Declined students appear more uniform across the GPA bands compared to waitlisted or admitted students.</p>
 <div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>wd <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"../data/cleaned_data/data_cleaned.csv"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>wd_bands <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(wd)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#wd_bands &lt;- subset(wd_bands, select = -c(...1))</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>wd_bands <span class="ot">&lt;-</span> wd_bands <span class="sc">%&gt;%</span> </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">GPA_Bands =</span> <span class="fu">case_when</span>(</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    GPA <span class="sc">&lt;</span> <span class="fl">2.40</span> <span class="sc">~</span> <span class="st">"&lt; 2.40"</span>, </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    GPA <span class="sc">&gt;=</span> <span class="fl">2.40</span> <span class="sc">&amp;</span> GPA <span class="sc">&lt;=</span> <span class="fl">2.49</span> <span class="sc">~</span> <span class="st">"2.40-2.49"</span>, </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    GPA <span class="sc">&gt;=</span> <span class="fl">2.50</span> <span class="sc">&amp;</span> GPA <span class="sc">&lt;=</span> <span class="fl">2.59</span> <span class="sc">~</span> <span class="st">"2.50-2.59"</span>, </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    GPA <span class="sc">&gt;=</span> <span class="fl">2.60</span> <span class="sc">&amp;</span> GPA <span class="sc">&lt;=</span> <span class="fl">2.69</span> <span class="sc">~</span> <span class="st">"2.60-2.69"</span>, </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    GPA <span class="sc">&gt;=</span> <span class="fl">2.70</span> <span class="sc">&amp;</span> GPA <span class="sc">&lt;=</span> <span class="fl">2.79</span> <span class="sc">~</span> <span class="st">"2.70-2.79"</span>, </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    GPA <span class="sc">&gt;=</span> <span class="fl">2.80</span> <span class="sc">&amp;</span> GPA <span class="sc">&lt;=</span> <span class="fl">2.89</span> <span class="sc">~</span> <span class="st">"2.80-2.89"</span>, </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    GPA <span class="sc">&gt;=</span> <span class="fl">2.90</span> <span class="sc">&amp;</span> GPA <span class="sc">&lt;=</span> <span class="fl">2.99</span> <span class="sc">~</span> <span class="st">"2.90-2.99"</span>, </span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    GPA <span class="sc">&gt;=</span> <span class="fl">3.00</span> <span class="sc">&amp;</span> GPA <span class="sc">&lt;=</span> <span class="fl">3.09</span> <span class="sc">~</span> <span class="st">"3.00-3.09"</span>, </span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    GPA <span class="sc">&gt;=</span> <span class="fl">3.10</span> <span class="sc">&amp;</span> GPA <span class="sc">&lt;=</span> <span class="fl">3.19</span> <span class="sc">~</span> <span class="st">"3.10-3.19"</span>, </span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    GPA <span class="sc">&gt;=</span> <span class="fl">3.20</span> <span class="sc">&amp;</span> GPA <span class="sc">&lt;=</span> <span class="fl">3.29</span> <span class="sc">~</span> <span class="st">"3.20-3.29"</span>, </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    GPA <span class="sc">&gt;=</span> <span class="fl">3.30</span> <span class="sc">&amp;</span> GPA <span class="sc">&lt;=</span> <span class="fl">3.39</span> <span class="sc">~</span> <span class="st">"3.30-3.39"</span>, </span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    GPA <span class="sc">&gt;=</span> <span class="fl">3.40</span> <span class="sc">&amp;</span> GPA <span class="sc">&lt;=</span> <span class="fl">3.49</span> <span class="sc">~</span> <span class="st">"3.40-3.49"</span>, </span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    GPA <span class="sc">&gt;=</span> <span class="fl">3.50</span> <span class="sc">&amp;</span> GPA <span class="sc">&lt;=</span> <span class="fl">3.59</span> <span class="sc">~</span> <span class="st">"3.50-3.59"</span>, </span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    GPA <span class="sc">&gt;=</span> <span class="fl">3.60</span> <span class="sc">&amp;</span> GPA <span class="sc">&lt;=</span> <span class="fl">3.69</span> <span class="sc">~</span> <span class="st">"3.60-3.69"</span>, </span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    GPA <span class="sc">&gt;=</span> <span class="fl">3.70</span> <span class="sc">&amp;</span> GPA <span class="sc">&lt;=</span> <span class="fl">3.79</span> <span class="sc">~</span> <span class="st">"3.70-3.79"</span>, </span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    GPA <span class="sc">&gt;=</span> <span class="fl">3.80</span> <span class="sc">&amp;</span> GPA <span class="sc">&lt;=</span> <span class="fl">3.89</span> <span class="sc">~</span> <span class="st">"3.80-3.89"</span>, </span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    GPA <span class="sc">&gt;=</span> <span class="fl">3.90</span> <span class="sc">&amp;</span> GPA <span class="sc">&lt;=</span> <span class="fl">3.99</span> <span class="sc">~</span> <span class="st">"3.90-3.99"</span>, </span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    GPA <span class="sc">==</span> <span class="fl">4.00</span> <span class="sc">~</span> <span class="st">"4.00"</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>wd_bands_count <span class="ot">&lt;-</span> wd_bands <span class="sc">%&gt;%</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(GPA_Bands, Decision) <span class="sc">%&gt;%</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">complete</span>(GPA_Bands, Decision, <span class="at">fill =</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="dv">0</span>))</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(wd_bands_count, <span class="fu">aes</span>(<span class="at">fill =</span> Decision, <span class="at">y =</span> n, <span class="at">x =</span> GPA_Bands)) <span class="sc">+</span> </span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">"dodge"</span>, <span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Decline"</span> <span class="ot">=</span> <span class="st">"firebrick"</span>, <span class="st">"Waitlist"</span> <span class="ot">=</span> <span class="st">"darkgoldenrod1"</span>, <span class="st">"Admit"</span> <span class="ot">=</span> <span class="st">"yellowgreen"</span>)) <span class="sc">+</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"GPA Bands"</span>, <span class="at">y =</span> <span class="st">"Number of Students"</span>, <span class="at">fill =</span> <span class="st">"Decision"</span>) <span class="sc">+</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span> </span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Comparison of GPA Across Decisions"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <p><img src="general_trends_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
-<section id="writing-scores" class="level2">
-<h2 class="anchored" data-anchor-id="writing-scores">Writing Scores</h2>
+<section id="test-scores" class="level2">
+<h2 class="anchored" data-anchor-id="test-scores">Test Scores</h2>
+<p>Internship Decisions are <strong>strongly positively correlated</strong> with test scores, as shown by the clear divisions of test scores among the groups besides a few outliers. Admitted students have the highest GPA, followed by waitlisted students and declined students.</p>
 <div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>wd_bands <span class="ot">&lt;-</span> wd_bands <span class="sc">%&gt;%</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Test_Score_Bands =</span> <span class="fu">case_when</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    TestScore <span class="sc">&lt;</span> <span class="dv">760</span> <span class="sc">~</span> <span class="st">"&lt; 760"</span>, </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    TestScore <span class="sc">&gt;=</span> <span class="dv">760</span> <span class="sc">&amp;</span> TestScore <span class="sc">&lt;=</span> <span class="dv">769</span> <span class="sc">~</span> <span class="st">"760-769"</span>, </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    TestScore <span class="sc">&gt;=</span> <span class="dv">770</span> <span class="sc">&amp;</span> TestScore <span class="sc">&lt;=</span> <span class="dv">779</span> <span class="sc">~</span> <span class="st">"770-779"</span>, </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    TestScore <span class="sc">&gt;=</span> <span class="dv">780</span> <span class="sc">&amp;</span> TestScore <span class="sc">&lt;=</span> <span class="dv">789</span> <span class="sc">~</span> <span class="st">"780-789"</span>, </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    TestScore <span class="sc">&gt;=</span> <span class="dv">790</span> <span class="sc">&amp;</span> TestScore <span class="sc">&lt;=</span> <span class="dv">799</span> <span class="sc">~</span> <span class="st">"790-799"</span>, </span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    TestScore <span class="sc">&gt;=</span> <span class="dv">800</span> <span class="sc">&amp;</span> TestScore <span class="sc">&lt;=</span> <span class="dv">809</span> <span class="sc">~</span> <span class="st">"800-809"</span>, </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    TestScore <span class="sc">&gt;=</span> <span class="dv">810</span> <span class="sc">&amp;</span> TestScore <span class="sc">&lt;=</span> <span class="dv">819</span> <span class="sc">~</span> <span class="st">"810-819"</span>, </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    TestScore <span class="sc">&gt;=</span> <span class="dv">820</span> <span class="sc">&amp;</span> TestScore <span class="sc">&lt;=</span> <span class="dv">829</span> <span class="sc">~</span> <span class="st">"820-829"</span>, </span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    TestScore <span class="sc">&gt;=</span> <span class="dv">830</span> <span class="sc">&amp;</span> TestScore <span class="sc">&lt;=</span> <span class="dv">839</span> <span class="sc">~</span> <span class="st">"830-839"</span>, </span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    TestScore <span class="sc">&gt;=</span> <span class="dv">840</span> <span class="sc">&amp;</span> TestScore <span class="sc">&lt;=</span> <span class="dv">849</span> <span class="sc">~</span> <span class="st">"840-849"</span>, </span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    TestScore <span class="sc">&gt;=</span> <span class="dv">850</span> <span class="sc">&amp;</span> TestScore <span class="sc">&lt;=</span> <span class="dv">859</span> <span class="sc">~</span> <span class="st">"850-859"</span>, </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    TestScore <span class="sc">&gt;=</span> <span class="dv">860</span> <span class="sc">&amp;</span> TestScore <span class="sc">&lt;=</span> <span class="dv">869</span> <span class="sc">~</span> <span class="st">"860-869"</span>, </span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    TestScore <span class="sc">&gt;=</span> <span class="dv">870</span> <span class="sc">&amp;</span> TestScore <span class="sc">&lt;=</span> <span class="dv">879</span> <span class="sc">~</span> <span class="st">"870-879"</span>, </span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    TestScore <span class="sc">&gt;=</span> <span class="dv">880</span> <span class="sc">&amp;</span> TestScore <span class="sc">&lt;=</span> <span class="dv">889</span> <span class="sc">~</span> <span class="st">"880-889"</span>, </span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    TestScore <span class="sc">&gt;=</span> <span class="dv">890</span> <span class="sc">&amp;</span> TestScore <span class="sc">&lt;=</span> <span class="dv">899</span> <span class="sc">~</span> <span class="st">"890-899"</span>, </span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    TestScore <span class="sc">&gt;=</span> <span class="dv">900</span> <span class="sc">~</span> <span class="st">"&gt;= 900"</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>wd_bands <span class="ot">&lt;-</span> wd_bands <span class="sc">%&gt;%</span> </span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Test_Score_Bands =</span> <span class="fu">factor</span>(Test_Score_Bands, <span class="at">levels =</span> <span class="fu">c</span>(</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"&lt; 760"</span>, <span class="st">"760-769"</span>, <span class="st">"770-779"</span>, <span class="st">"780-789"</span>, <span class="st">"790-799"</span>, </span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">"800-809"</span>, <span class="st">"810-819"</span>, <span class="st">"820-829"</span>, <span class="st">"830-839"</span>, <span class="st">"840-849"</span>, </span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"850-859"</span>, <span class="st">"860-869"</span>, <span class="st">"870-879"</span>, <span class="st">"880-889"</span>, <span class="st">"890-899"</span>, <span class="st">"&gt;= 900"</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  )))</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>wd_bands_count <span class="ot">&lt;-</span> wd_bands <span class="sc">%&gt;%</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Test_Score_Bands, Decision) <span class="sc">%&gt;%</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">complete</span>(Test_Score_Bands, Decision, <span class="at">fill =</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="dv">0</span>))</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(wd_bands_count, <span class="fu">aes</span>(<span class="at">fill =</span> Decision, <span class="at">y =</span> n, <span class="at">x =</span> Test_Score_Bands)) <span class="sc">+</span> </span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">"dodge"</span>, <span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Decline"</span> <span class="ot">=</span> <span class="st">"firebrick"</span>, <span class="st">"Waitlist"</span> <span class="ot">=</span> <span class="st">"darkgoldenrod1"</span>, <span class="st">"Admit"</span> <span class="ot">=</span> <span class="st">"yellowgreen"</span>)) <span class="sc">+</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Test Score Bands"</span>, <span class="at">y =</span> <span class="st">"Number of Students"</span>, <span class="at">fill =</span> <span class="st">"Decision"</span>) <span class="sc">+</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span> </span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Comparison of Test Scores Across Decisions"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <p><img src="general_trends_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
-<section id="work-experience" class="level2">
-<h2 class="anchored" data-anchor-id="work-experience">Work Experience</h2>
+<section id="writing-scores" class="level2">
+<h2 class="anchored" data-anchor-id="writing-scores">Writing Scores</h2>
+<p>Internship Decisions are <strong>positively correlated</strong> with writing test scores. Admitted students have the highest writing scores, followed by waitlisted students and declined students besides a few outliers.</p>
 <div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>wd_bands <span class="ot">&lt;-</span> wd_bands <span class="sc">%&gt;%</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Writing_Score_Bands =</span> <span class="fu">case_when</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    WritingScore <span class="sc">&lt;</span> <span class="dv">60</span> <span class="sc">~</span> <span class="st">"&lt; 60"</span>, </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    WritingScore <span class="sc">&gt;=</span> <span class="dv">60</span> <span class="sc">&amp;</span> WritingScore <span class="sc">&lt;=</span> <span class="dv">64</span> <span class="sc">~</span> <span class="st">"60-64"</span>, </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    WritingScore <span class="sc">&gt;=</span> <span class="dv">65</span> <span class="sc">&amp;</span> WritingScore <span class="sc">&lt;=</span> <span class="dv">69</span> <span class="sc">~</span> <span class="st">"65-69"</span>, </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    WritingScore <span class="sc">&gt;=</span> <span class="dv">70</span> <span class="sc">&amp;</span> WritingScore <span class="sc">&lt;=</span> <span class="dv">74</span> <span class="sc">~</span> <span class="st">"70-74"</span>, </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    WritingScore <span class="sc">&gt;=</span> <span class="dv">75</span> <span class="sc">&amp;</span> WritingScore <span class="sc">&lt;=</span> <span class="dv">79</span> <span class="sc">~</span> <span class="st">"75-79"</span>, </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    WritingScore <span class="sc">&gt;=</span> <span class="dv">80</span> <span class="sc">&amp;</span> WritingScore <span class="sc">&lt;=</span> <span class="dv">84</span> <span class="sc">~</span> <span class="st">"80-84"</span>, </span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    WritingScore <span class="sc">&gt;=</span> <span class="dv">85</span> <span class="sc">&amp;</span> WritingScore <span class="sc">&lt;=</span> <span class="dv">89</span> <span class="sc">~</span> <span class="st">"85-89"</span>, </span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    WritingScore <span class="sc">&gt;=</span> <span class="dv">90</span> <span class="sc">~</span> <span class="st">"&gt;= 90"</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>wd_bands <span class="ot">&lt;-</span> wd_bands <span class="sc">%&gt;%</span> </span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Writing_Score_Bands =</span> <span class="fu">factor</span>(Writing_Score_Bands, <span class="at">levels =</span> <span class="fu">c</span>(</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"&lt; 60"</span>, <span class="st">"60-64"</span>, <span class="st">"65-69"</span>, <span class="st">"70-74"</span>, <span class="st">"75-79"</span>, </span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"80-84"</span>, <span class="st">"85-89"</span>, <span class="st">"&gt;= 90"</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  )))</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>wd_bands_count <span class="ot">&lt;-</span> wd_bands <span class="sc">%&gt;%</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Writing_Score_Bands, Decision) <span class="sc">%&gt;%</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">complete</span>(Writing_Score_Bands, Decision, <span class="at">fill =</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="dv">0</span>))</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(wd_bands_count, <span class="fu">aes</span>(<span class="at">fill =</span> Decision, <span class="at">y =</span> n, <span class="at">x =</span> Writing_Score_Bands)) <span class="sc">+</span> </span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">"dodge"</span>, <span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Decline"</span> <span class="ot">=</span> <span class="st">"firebrick"</span>, <span class="st">"Waitlist"</span> <span class="ot">=</span> <span class="st">"darkgoldenrod1"</span>, <span class="st">"Admit"</span> <span class="ot">=</span> <span class="st">"yellowgreen"</span>)) <span class="sc">+</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"GPA Bands"</span>, <span class="at">y =</span> <span class="st">"Number of Students"</span>, <span class="at">fill =</span> <span class="st">"Decision"</span>) <span class="sc">+</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span> </span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Comparison of Writing Scores Across Decisions"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <p><img src="general_trends_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
-<section id="volunteer-experience" class="level2">
-<h2 class="anchored" data-anchor-id="volunteer-experience">Volunteer Experience</h2>
+<section id="work-experience" class="level2">
+<h2 class="anchored" data-anchor-id="work-experience">Work Experience</h2>
+<p>By observing the plot below, we can see that work experience is <strong>uncorrelated</strong> with admission decision.</p>
 <div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>wd_bands <span class="ot">&lt;-</span> wd_bands <span class="sc">%&gt;%</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">WorkExp_Bands =</span> <span class="fu">case_when</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    WorkExp <span class="sc">&lt;</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"&lt; 1"</span>, </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    WorkExp <span class="sc">&gt;=</span> <span class="dv">1</span> <span class="sc">&amp;</span> WorkExp <span class="sc">&lt;=</span> <span class="fl">1.9</span> <span class="sc">~</span> <span class="st">"1-1.9"</span>, </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    WorkExp <span class="sc">&gt;=</span> <span class="dv">2</span> <span class="sc">&amp;</span> WorkExp <span class="sc">&lt;=</span> <span class="fl">2.9</span> <span class="sc">~</span> <span class="st">"2-2.9"</span>, </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    WorkExp <span class="sc">&gt;=</span> <span class="dv">3</span> <span class="sc">&amp;</span> WorkExp <span class="sc">&lt;=</span> <span class="fl">3.9</span> <span class="sc">~</span> <span class="st">"3-3.9"</span>, </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    WorkExp <span class="sc">&gt;=</span> <span class="dv">4</span> <span class="sc">&amp;</span> WorkExp <span class="sc">&lt;=</span> <span class="fl">4.9</span> <span class="sc">~</span> <span class="st">"4-4.9"</span>, </span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    WorkExp <span class="sc">&gt;=</span> <span class="dv">5</span> <span class="sc">&amp;</span> WorkExp <span class="sc">&lt;=</span> <span class="fl">5.9</span> <span class="sc">~</span> <span class="st">"5-5.9"</span>, </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    WorkExp <span class="sc">&gt;=</span> <span class="dv">6</span> <span class="sc">&amp;</span> WorkExp <span class="sc">&lt;=</span> <span class="fl">6.9</span> <span class="sc">~</span> <span class="st">"6-6.9"</span>, </span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    WorkExp <span class="sc">&gt;=</span> <span class="dv">7</span> <span class="sc">&amp;</span> WorkExp <span class="sc">&lt;=</span> <span class="fl">7.9</span> <span class="sc">~</span> <span class="st">"7-7.9"</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    WorkExp <span class="sc">&gt;=</span> <span class="dv">8</span> <span class="sc">&amp;</span> WorkExp <span class="sc">&lt;=</span> <span class="fl">8.9</span> <span class="sc">~</span> <span class="st">"8-8.9"</span>,</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    WorkExp <span class="sc">&gt;=</span> <span class="dv">9</span> <span class="sc">~</span> <span class="st">"&gt;= 9"</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>wd_bands <span class="ot">&lt;-</span> wd_bands <span class="sc">%&gt;%</span> </span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">WorkExp_Bands =</span> <span class="fu">factor</span>(WorkExp_Bands, <span class="at">levels =</span> <span class="fu">c</span>(</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"&lt; 1"</span>, <span class="st">"1-1.9"</span>, <span class="st">"2-2.9"</span>, <span class="st">"3-3.9"</span>, <span class="st">"4-4.9"</span>, </span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"5-5.9"</span>, <span class="st">"6-6.9"</span>, <span class="st">"7-7.9"</span>, <span class="st">"8-8.9"</span>,<span class="st">"&gt;= 9"</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  )))</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>wd_bands_count <span class="ot">&lt;-</span> wd_bands <span class="sc">%&gt;%</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(WorkExp_Bands, Decision) <span class="sc">%&gt;%</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">complete</span>(WorkExp_Bands, Decision, <span class="at">fill =</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="dv">0</span>))</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(wd_bands_count, <span class="fu">aes</span>(<span class="at">fill =</span> Decision, <span class="at">y =</span> n, <span class="at">x =</span> WorkExp_Bands)) <span class="sc">+</span> </span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">"dodge"</span>, <span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Decline"</span> <span class="ot">=</span> <span class="st">"firebrick"</span>, <span class="st">"Waitlist"</span> <span class="ot">=</span> <span class="st">"darkgoldenrod1"</span>, <span class="st">"Admit"</span> <span class="ot">=</span> <span class="st">"yellowgreen"</span>)) <span class="sc">+</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Work Experience Bands (in years)"</span>, <span class="at">y =</span> <span class="st">"Number of Students"</span>, <span class="at">fill =</span> <span class="st">"Decision"</span>) <span class="sc">+</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span> </span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Comparison of Work Experience Across Decisions"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <p><img src="general_trends_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
-<section id="correlations" class="level2">
-<h2 class="anchored" data-anchor-id="correlations">Correlations</h2>
+<section id="volunteer-experience" class="level2">
+<h2 class="anchored" data-anchor-id="volunteer-experience">Volunteer Experience</h2>
+<p>By observing the plot below, we can see that volunteer experience is <strong>uncorrelated</strong> with admission decision.</p>
 <div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>wd_bands_count <span class="ot">&lt;-</span> wd_bands <span class="sc">%&gt;%</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(VolunteerLevel, Decision) <span class="sc">%&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">complete</span>(VolunteerLevel, Decision, <span class="at">fill =</span> <span class="fu">list</span>(<span class="at">n =</span> <span class="dv">0</span>))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(wd_bands_count, <span class="fu">aes</span>(<span class="at">fill =</span> Decision, <span class="at">y =</span> n, <span class="at">x =</span> <span class="fu">as.factor</span>(VolunteerLevel))) <span class="sc">+</span> </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">"dodge"</span>, <span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Decline"</span> <span class="ot">=</span> <span class="st">"firebrick"</span>, <span class="st">"Waitlist"</span> <span class="ot">=</span> <span class="st">"darkgoldenrod1"</span>, <span class="st">"Admit"</span> <span class="ot">=</span> <span class="st">"yellowgreen"</span>)) <span class="sc">+</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Volunteer Level"</span>, <span class="at">y =</span> <span class="st">"Number of Students"</span>, <span class="at">fill =</span> <span class="st">"Decision"</span>) <span class="sc">+</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span> </span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Comparison of Volunteer Level Across Decisions"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <p><img src="general_trends_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<p>Strongly Correlated:</p>
+<ul>
+<li>Test Score</li>
+<li>Writing Test Score</li>
+<li>GPA</li>
+</ul>
+<p>Uncorrelated or Weakly Correlated:</p>
+<ul>
+<li>Gender</li>
+<li>Volunteer Experience</li>
+<li>Work Experience</li>
+</ul>
 
 
 </section>

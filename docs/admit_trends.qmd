@@ -33,7 +33,11 @@ data %>%
   tab_header(title = md("Average scores for students by decision"))
 ```
 
+Admitted students had an average test score of **960.2**, an average writing score of **91.2**, and an average GPA of **3.74**, all three measures being higher than students who were waitlisted or declined. Admitted students had an average of **2.1** **years** **of work experience** and an average **volunteer level of 2.2**, similar to students who were waitlisted or declined.
+
 ### Exploring Student Statistics Based on Admit Decision
+
+For **test score**, **writing score**, and **GPA** there is a visible trend of admitted students having the highest average and declined students having the lowest average.
 
 ```{r}
 data %>%
@@ -59,6 +63,8 @@ data %>%
   ggplot() + geom_col(aes(y = Decision, x = `GPA`, fill = Decision)) + scale_fill_manual(values = c("firebrick", "darkgoldenrod1", "yellowgreen")) + theme_minimal() + labs(title = "Admission decision by GPA", x= "Average GPA") + theme(plot.title = element_text(hjust = 0.5))
 ```
 
+For **work experience** and **volunteer level** there is no visible trend.
+
 ```{r}
 data %>%
   mutate(Decision = fct_relevel(Decision, "Decline", "Waitlist", "Admit")) %>%
@@ -79,6 +85,8 @@ data %>%
 
 #### Demographics
 
+Male and female students had identical admit, waitlist, and decline rates.
+
 ```{r}
 data$Gender <- as.factor(data$Gender)
 
@@ -88,13 +96,17 @@ data %>%
   ggplot() + geom_bar(aes(y = Gender, fill = Decision), position = "fill") + scale_fill_manual(values = c("firebrick", "darkgoldenrod1", "yellowgreen")) + theme_minimal()  +labs(title = "Admission proportion by gender", x = "Proportion") + theme(plot.title = element_text(hjust = 0.5))
 ```
 
+There are differences in admit, waitlist, and decline rates between states.
+
 ```{r}
 data %>%
-  mutate(Decision = fct_relevel(Decision, "Decline", "Waitlist", "Admit")) %>%
+  mutate(Decision = fct_relevel(Decision, "Decline", "Waitlist", "Admit"))  %>%
   ggplot() + geom_bar(aes(y = State, fill = Decision), position = "fill") + scale_fill_manual(values = c("firebrick", "darkgoldenrod1", "yellowgreen")) + theme_minimal()  +labs(title = "Admission proportion by state", x = "Proportion") + theme(plot.title = element_text(hjust = 0.5))
 ```
 
 #### Scores
+
+The students with the highest GPAs had the highest rates of admission to the internship. All students with GPAs of **3.9 or greater** were admitted while the majority of students with GPAs of 3.6 or higher were admitted. No students with GPAs below 3.5 were admitted.
 
 ```{r}
 data %>%
@@ -112,6 +124,8 @@ data %>%
   ggplot() + geom_bar(aes(y = GPA, fill = Decision), position = "fill") + scale_fill_manual(values = c("firebrick", "darkgoldenrod1", "yellowgreen")) + theme_minimal()  +labs(title = "Admission proportion by GPA", x = "Proportion") + theme(plot.title = element_text(hjust = 0.5))
 ```
 
+All students that scored **above 900** on the test were admitted and all students that were waitlisted scored between 800 and 900.
+
 ```{r}
 data %>%
   mutate(Decision = fct_relevel(Decision, "Decline", "Waitlist", "Admit")) %>%
@@ -119,6 +133,8 @@ data %>%
                     ifelse(TestScore >= 800,"800 to 900","799 or lower"))) %>%
   ggplot() + geom_bar(aes(y = TestScore, fill = Decision), position = "fill") + scale_fill_manual(values = c("firebrick", "darkgoldenrod1", "yellowgreen")) + theme_minimal()  +labs(title = "Admission proportion by test score", x = "Proportion", y = "Test Score") + theme(plot.title = element_text(hjust = 0.5))
 ```
+
+All students with a **writing score greater than 90** were admitted while the majority of students with a writing score below 90 were waitlisted or declined.
 
 ```{r}
 data %>%
@@ -129,6 +145,8 @@ data %>%
 ```
 
 #### Experience
+
+There is no visible trend when it comes to admit rates and work experience or volunteer level.
 
 ```{r}
 data %>%
@@ -161,6 +179,8 @@ hc <- hclust(dist)
 corr_mat <-corr_mat[hc$order, hc$order]
 ```
 
+The most strongly correlated variables are test score, GPA, and writing score.
+
 ```{r}
 
 melted_corr_mat <- melt(corr_mat)
@@ -178,6 +198,8 @@ geom_tile() + theme_minimal() + labs(title = "Correlation between all variables"
 
 #### Demographics
 
+Average test score does not differ for male and female students.
+
 ```{r}
 data %>%
   group_by(Gender) %>%
@@ -186,11 +208,13 @@ data %>%
 
 ```
 
+The three states with the highest test score averages (California, Florida, and Colorado) also had the highest admit rates for students.
+
 ```{r}
 data %>%
   group_by(State) %>%
   summarize(`Test Score` = mean(TestScore), `Percent Admitted` = mean(Decision == "Admit")) %>%
-  mutate(State = fct_reorder(State, `Percent Admitted`)) %>%
+  mutate(State = fct_reorder(State, `Test Score`)) %>%
   ggplot() + geom_col(aes(x = State, y = `Test Score`, fill = `Percent Admitted`)) + scale_fill_gradient(low = "grey80", high = "yellowgreen") + theme_minimal() + coord_flip()
 ```
 
@@ -202,11 +226,15 @@ data %>%
   ggplot() + geom_point(aes(x=TestScore, y=GPA, color = Decision)) + scale_color_manual(values = c("yellowgreen", "darkgoldenrod1", "firebrick")) +theme_minimal() + theme(plot.title = element_text(hjust = 0.5)) + labs(title = "GPA and Test Score", x = "Test Score")
 ```
 
+There is one student with a low test score and high GPA who was admitted. All other admitted students were in the highest band of test scores (above 950).
+
 ```{r}
 data %>%
   mutate(Decision = fct_relevel(Decision, "Admit", "Waitlist", "Decline")) %>%
   ggplot() + geom_point(aes(x=TestScore, y=WritingScore, color = Decision)) + scale_color_manual(values = c("yellowgreen", "darkgoldenrod1", "firebrick")) +theme_minimal() + theme(plot.title = element_text(hjust = 0.5)) + labs(title = "Writing Score and Test Score", x = "Test Score", y = "Writing Score")
 ```
+
+This student also has a high writing score and is the only student with a low test score and high writing score to be admitted.
 
 #### Experience
 
@@ -216,8 +244,16 @@ data %>%
   ggplot() + geom_point(aes(x=TestScore, y=WorkExp, color = Decision)) + scale_color_manual(values = c("yellowgreen", "darkgoldenrod1", "firebrick")) +theme_minimal() + theme(plot.title = element_text(hjust = 0.5)) + labs(title = "Work Experience and Test Score", x = "Test Score", y = "Work Experience (years)")
 ```
 
+Students with a wide range of work experiences were admitted, waitlisted, and declined. There does not appear to be a relationship between work experience and test score.
+
 ```{r}
 data %>%
   mutate(Decision = fct_relevel(Decision, "Admit", "Waitlist", "Decline")) %>%
   ggplot() + geom_point(aes(x=TestScore, y=VolunteerLevel, color = Decision)) + scale_color_manual(values = c("yellowgreen", "darkgoldenrod1", "firebrick")) +theme_minimal() + theme(plot.title = element_text(hjust = 0.5)) + labs(title = "Volunteer Level and Test Score", x = "Test Score", y = "Volunteer Level")
 ```
+
+Students with a wide range of volunteer levels were admitted, waitlisted, and declined. There does not appear to be a relationship between volunteer level and test score.
+
+### Conclusion
+
+Based on the trends explored above, the most important consideration for this company's hiring team seemed to be the students' test scores. With few exceptions, using only the test score for a student we can make a strong prediction for whether or not they were admitted.

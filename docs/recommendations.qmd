@@ -1,0 +1,17 @@
+---
+title: "Recommendations"
+format: html
+---
+
+Our recommendations are as follows:
+
+1. **Communication** will increase transperency
+   * Create a report for students on these internship admission trends
+   * Organize internship advising to increase feedback.
+  
+2. **Test Prep Course**
+   * Test Score was the most correlated variable with admission so creating a test prep class would help students increase their scores.
+3. **Writing Prep Course**
+   * Writing Score was strongly positively correlated with admission so creating a test prep course would help students increase their writing scores.
+4. Increase the number of required **English classes**
+   * Increasing the number of required English classes would improve student's writing and writing scores.

@@ -1,7 +1,13 @@
 ---
-title: "website"
+title: "Goals and Purpose"
 ---
 
-This is a Quarto website.
+#### In this report we will explore trends in acceptance to a summer internship based on student demographics, scores, and experience. The purpose of the report is to increase decision transparency and increase internship support and resources for students.
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+### **Goals:** 
+
+#### Identify trends within decision groups
+
+#### Identify the most important aspect of a student's application
+
+#### Identify how the university can better support students

@@ -13,6 +13,8 @@ website:
         text: Admit Trends
       - href: waitlist_decline.qmd
         text: Waitlist and Decline Trends
+      - href: recomendations.qmd
+        text: Recommendations
 
 format:
   html:
